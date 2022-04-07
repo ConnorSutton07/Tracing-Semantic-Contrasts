@@ -1,0 +1,200 @@
+[
+    {
+        "title": "Frankenstein",
+        "subtitle": "the Modern Prometheus",
+        "author": "Mary Shelley",
+        "year": 1818,
+        "type": "novel",
+        "file": "frankenstein.txt",
+        "gender": "F"
+    },
+    {
+        "title": "The Sorrows of Young Werther",
+        "subtitle": "",
+        "author": "Johann Wolfgang von Goethe",
+        "year": 1774,
+        "type": "novel",
+        "file": "the_sorrows_of_young_werther.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Wuthering Heights",
+        "subtitle": "",
+        "author": "Emily Brontë",
+        "year": 1847,
+        "type": "novel",
+        "file": "wuthering_heights.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Songs of Innocence and of Experience",
+        "subtitle": "",
+        "author": "William Blake",
+        "year": 1789,
+        "type": "anthology",
+        "file": "the_sorrows_of_young_werther.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Pride and Prejudice",
+        "subtitle": "",
+        "author": "Jane Austen",
+        "year": 1813,
+        "type": "novel",
+        "file": "pride_and_prejudice.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Sense and Sensibility",
+        "subtitle": "",
+        "author": "Jane Austen",
+        "year": 1811,
+        "type": "novel",
+        "file": "sense_and_sensibility.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Jane Eyre",
+        "subtitle": "An Autobiography",
+        "author": "Charlotte Brontë",
+        "year": 1847,
+        "type": "novel",
+        "file": "jane_eyre.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Lyrical Ballads",
+        "subtitle": "With a Few Other Poems",
+        "author": "William Wordsworth & Samuel Taylor Coleridge",
+        "year": 1798,
+        "type": "anthology",
+        "file": "lyrical_ballads.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Last Man",
+        "subtitle": "",
+        "author": "Mary Shelley",
+        "year": 1826,
+        "type": "novel",
+        "file": "the_last_man.txt",
+        "gender": "F"
+    },
+    {
+        "title": "The Scarlet Letter",
+        "subtitle": "",
+        "author": "Nathaniel Hawthorne",
+        "year": 1850,
+        "type": "novel",
+        "file": "the_scarlet_letter.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Prometheus Unbound",
+        "subtitle": "",
+        "author": "Percy Bysshe Shelley",
+        "year": 1820,
+        "type": "drama",
+        "file": "prometheus_unbound.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Manfred",
+        "subtitle": "",
+        "author": "Lord Byron",
+        "year": 1817,
+        "type": "drama",
+        "file": "manfred.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Bride of Lammermoor",
+        "subtitle": "Tales of My Landlord",
+        "author": "Walter Scott",
+        "year": 1819,
+        "type": "novel",
+        "file": "the_bride_of_lammermoor.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Middlemarch",
+        "subtitle": "A Study of Provincial Life",
+        "author": "Mary Anne Evans",
+        "year": 1871,
+        "type": "novel",
+        "file": "middlemarch.txt",
+        "gender": "F"
+    },
+    {
+        "title": "The Works of Edgar Allan Poe",
+        "subtitle": "",
+        "author": "Edgar Allan Poe",
+        "year": 1849,
+        "type": "collection",
+        "file": "the_works_of_edgar_allan_poe.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Dracula",
+        "subtitle": "",
+        "author": "Bram Stoker",
+        "year": 1897,
+        "type": "novel",
+        "file": "dracula.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Mysteries of Udolpho",
+        "subtitle": "",
+        "author": "Anne Radcliffe",
+        "year": 1794,
+        "type": "novel",
+        "file": "the_mysteries_of_udolpho.txt",
+        "gender": "F"
+    },
+    {
+        "title": "The Romance of the Forest",
+        "subtitle": "Interspersed With Some Pieces of Poetry",
+        "author": "Anne Radcliffe",
+        "year": 1791,
+        "type": "novel",
+        "file": "the_romance_of_the_forest.txt",
+        "gender": "F"
+    },
+    {
+        "title": "The Old English Baron",
+        "subtitle": "",
+        "author": "Clara Reeve",
+        "year": 1764,
+        "type": "novel",
+        "file": "the_old_english_baron.txt",
+        "gender": "F"
+    },
+    {
+        "title": "The Castle of Otranto",
+        "subtitle": "",
+        "author": "Horace Walpole",
+        "year": 1764,
+        "type": "novel",
+        "file": "the_castle_of_otranto.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Tenant of Wildfell Hall",
+        "subtitle": "",
+        "author": "Anne Brontë",
+        "year": 1848,
+        "type": "novel",
+        "file": "the_tenant_of_wildfell_hall.txt",
+        "gender": "F"
+    },
+    {
+        "title": "North and South",
+        "subtitle": "",
+        "author": "Elizabeth Gaskell",
+        "year": 1854,
+        "type": "novel",
+        "file": "north_and_south.txt",
+        "gender": "F"
+    }
+]
