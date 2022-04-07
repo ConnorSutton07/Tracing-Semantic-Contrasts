@@ -20,7 +20,7 @@
     {
         "title": "Wuthering Heights",
         "subtitle": "",
-        "author": "Emily Brontë",
+        "author": "Emily Bronte",
         "year": 1847,
         "type": "novel",
         "file": "wuthering_heights.txt",
@@ -56,7 +56,7 @@
     {
         "title": "Jane Eyre",
         "subtitle": "An Autobiography",
-        "author": "Charlotte Brontë",
+        "author": "Charlotte Bronte",
         "year": 1847,
         "type": "novel",
         "file": "jane_eyre.txt",
@@ -182,7 +182,7 @@
     {
         "title": "The Tenant of Wildfell Hall",
         "subtitle": "",
-        "author": "Anne Brontë",
+        "author": "Anne Bronte",
         "year": 1848,
         "type": "novel",
         "file": "the_tenant_of_wildfell_hall.txt",
