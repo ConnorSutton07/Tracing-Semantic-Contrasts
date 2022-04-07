@@ -1,8 +1,10 @@
 import os
 import json
-from core import ui
+from core import ui, settings
 from core.text import Text
 from typing import List, Dict
+from tqdm import tqdm
+import matplotlib.pyplot as plt 
 
 class Driver:
     def __init__(self) -> None:
@@ -14,9 +16,9 @@ class Driver:
         # list of methods that user will be able to choose from 
         self.modes = [
             ("Compare Across Corpora", self.inter_corpus_analysis),
-            ("Compare Within Corpus", self.intra_corpus_analysis),
-            ("Generate Wordclouds", self.generate_wordclouds),
-            ("Print Corpus Information", self.print_corpus_info)
+            ("Compare Within Corpus",  self.intra_corpus_analysis),
+            ("Generate Wordclouds",    self.generate_wordclouds),
+            ("Print Corpus Contents",  self.print_corpus_info)
         ]
 
         self.introduction()
@@ -47,8 +49,24 @@ class Driver:
         raise NotImplementedError
 
     def generate_wordclouds(self):
-        raise NotImplementedError
+        corpus, name = self.select_corpus()
+        if corpus is None: return 
 
+        save_path = self.get_path([self.paths['figures'], name, 'wordclouds'])
+        print("Generating wordclouds...")
+        for text in tqdm(corpus):
+            path = os.path.join(save_path, text.title + ".png")
+            fig = plt.figure()
+            plt.imshow(text.generate_wordcloud(
+                stopwords = settings.stopwords,
+                size = (600, 600)),
+                interpolation = 'bilinear',
+                cmap = 'Paired'
+            )
+            plt.axis('off')
+            plt.savefig(path)
+            plt.close(fig)
+        print()
 
     # ----------------------------------------------
     #              Utility Methods
@@ -59,7 +77,10 @@ class Driver:
         Prints the author, year, and title for each work in a corpus
 
         """
-        corpus = self.select_corpus()
+        corpus, name = self.select_corpus()
+        if corpus is None: return 
+
+        print(f"\n{name} Texts: ")
         for text in corpus:
             print('-' * 50)
             print(text.get_info())
@@ -76,6 +97,22 @@ class Driver:
         texts.sort(key = lambda t: t.year) # sort texts by year (ascending)
         return texts
 
+    def get_path(self, path_list: List[str]) -> str: 
+        """
+        Checks if the path from the beginning to end of the list exists
+        If so, return that path
+        If not, create that path and then return it
+
+        Used for saving figures (e.g., wordclouds, graphs, etc.)
+
+        """
+        path = path_list[0]
+        for i in range(1, len(path_list)):
+            new_path = os.path.join(path, path_list[i])
+            if not os.path.exists(new_path): os.mkdir(new_path)
+            path = new_path 
+        return path 
+
     # ----------------------------------------------
     #                UI Methods
     #-----------------------------------------------
@@ -84,10 +121,10 @@ class Driver:
         """
         Choose type of analysis
         Options:
-            1) Compare Across Corpora (eg. Greek vs. Rennaissance)
-            2) Compare Within Corpus (eg. Male vs Female Romanticists)
+            1) Compare Across Corpora (e.g., Greek vs. Rennaissance)
+            2) Compare Within Corpus (e.g., Male vs Female Romanticists)
             3) Generate Wordclouds
-            4) Print Corpus Information
+            4) Print Corpus Contents
             5) Exit
 
         """
@@ -101,12 +138,9 @@ class Driver:
             return self.modes[choice][1] # return the method associated with the chosen mode
         return None # user has chosen to leave the program
 
-    def select_corpus(self) -> List[Text]: 
+    def select_corpus(self) -> (List[Text], str): 
         """
-        Retrieves the 'info.json' file of the chosen corpus
-
-        Calls retrieve_texts() to return a list of Text objects associated
-        with the corpus
+        Returns a list of texts for a chosen corpus as well as the corpus' name
 
         """
         corpora: List[str] = os.listdir(path = self.paths['corpora']) # retrieve list of subdirectories in corpora directory
@@ -120,5 +154,8 @@ class Driver:
             corpus_path = os.path.join(self.paths['corpora'], corpora[choice]) # find info.json
             # open info.json and read its contents into 'info'
             with open(os.path.join(corpus_path, 'info.json')) as infile: info = json.load(infile) 
-            return self.retrieve_texts(info, corpus_path) 
+            return self.retrieve_texts(info, corpus_path), corpora[choice]
         return None # user has chosen to go back
+
+
+            

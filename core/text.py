@@ -12,13 +12,18 @@ class Text:
     def get_info(self) -> None:
         return f"Author: {self.author}\nTitle:  {self.title}\nYear:   {self.year}"
 
-    def head(self, length: int = 25):
+    def head(self, length: int = 100):
         return self.text[:length]
 
     def generate_wordcloud(self, size: int, stopwords: List[str]) -> WordCloud:
-        return #return ()
+        return WordCloud(
+            stopwords = stopwords, 
+            background_color = "white",
+            width = size[0], 
+            height = size[1]
+        ).generate(self.text)
 
     @staticmethod
     def load_text(file: str) -> str:
         with open(file, encoding = 'utf8') as f: contents = f.read()
-        return f
+        return contents
