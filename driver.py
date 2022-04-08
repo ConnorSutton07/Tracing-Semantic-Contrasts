@@ -2,9 +2,11 @@ import os
 import json
 from core import ui, settings
 from core.text import Text
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from tqdm import tqdm
 import matplotlib.pyplot as plt 
+import multiprocessing as mp 
+import time 
 
 class Driver:
     def __init__(self) -> None:
@@ -49,28 +51,46 @@ class Driver:
         raise NotImplementedError
 
     def generate_wordclouds(self):
+        """
+        Generates wordclouds for each text in a given corpus
+        Saves to Figures/<corpus>/wordclouds/
+        Multiprocessed
+
+        """
         corpus, name = self.select_corpus()
         if corpus is None: return 
 
         save_path = self.get_path([self.paths['figures'], name, 'wordclouds'])
+        paths = [os.path.join(save_path, text.title + ".png") for text in corpus]
+        args = list(zip(corpus, paths)) 
+
         print("Generating wordclouds...")
-        for text in tqdm(corpus):
-            path = os.path.join(save_path, text.title + ".png")
-            fig = plt.figure()
-            plt.imshow(text.generate_wordcloud(
-                stopwords = settings.stopwords,
-                size = (600, 600)),
-                interpolation = 'bilinear',
-                cmap = 'Paired'
-            )
-            plt.axis('off')
-            plt.savefig(path)
-            plt.close(fig)
-        print()
+        with mp.Pool(processes = 4) as p:
+            list(tqdm(p.imap_unordered(self.generate_wordcloud_work, args), total = len(args)))
+        end = time.time()
+
 
     # ----------------------------------------------
     #              Utility Methods
     #-----------------------------------------------
+
+    def generate_wordcloud_work(self, args: Tuple[Text, str]):
+        """
+        Helper function called by generate_wordclouds
+        Plots the wordcloud image with matplotlib and saves
+        
+        """
+        text, path = args
+        fig = plt.figure()
+        plt.imshow(text.generate_wordcloud(
+            stopwords = settings.stopwords,
+            size = (600, 600)),
+            interpolation = 'bilinear',
+            cmap = 'Paired'
+        )
+        plt.axis('off')
+        plt.savefig(path)
+        plt.close(fig)
 
     def print_corpus_info(self):
         """
