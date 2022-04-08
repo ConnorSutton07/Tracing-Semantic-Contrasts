@@ -1,15 +1,15 @@
-Things to do:
-    Fill out Romantic / Gothic corpus - Tevin
+### Things to do: 
+    Fill out Romantic / Gothic corpus - Tevin 
     Add mutual information score - Michael
     Add word vector generation and analysis - Rodrigo
     Add preprocessing - Connor 
 
 
-Later 
+### Later 
     Powerpoint / Document for report
-    Add more corpora (Rennaissance & Greek literature)
+    Add more corpora (Rennaissance & Greek literature) (maybe)
 
 
-Word Vectors Visualization
+### Word Vector Visualization
     - 2D plotting of word Vectors
     - Table 
