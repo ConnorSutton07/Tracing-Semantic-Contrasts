@@ -1,6 +1,6 @@
 import os
 import json
-from core import ui, settings
+from core import ui, settings, nlp 
 from core.text import Text
 from typing import List, Dict, Tuple
 from tqdm import tqdm
@@ -14,12 +14,14 @@ class Driver:
         self.paths["current"]   = os.getcwd()
         self.paths["corpora"]   = os.path.join(self.paths["current"], "corpora")
         self.paths["figures"]   = os.path.join(self.paths["current"], "figures")
+        self.paths["models"]    = os.path.join(self.paths["current"], "models")
 
         # list of methods that user will be able to choose from 
         self.modes = [
             ("Compare Across Corpora", self.inter_corpus_analysis),
             ("Compare Within Corpus",  self.intra_corpus_analysis),
             ("Generate Wordclouds",    self.generate_wordclouds),
+            ("Generate Models",     self.generate_models),
             ("Print Corpus Contents",  self.print_corpus_info)
         ]
 
@@ -50,6 +52,33 @@ class Driver:
     def intra_corpus_analysis(self):
         raise NotImplementedError
 
+    def generate_models(self):
+        """
+        Preprocesses text and saves a frequency dictionary to the
+        models directory
+
+        In the future, this could also generate the word embeddings
+
+        """
+        corpus, name = self.select_corpus()
+        if corpus is None: return
+
+        print("Creating word frequency dictionary...")
+        frequency_dict = dict()
+
+        for document in tqdm(corpus):
+            text = nlp.preprocess_text(document.text, stopwords = settings.stopwords)
+            cur_dict = nlp.create_frequency_dict(text)
+            if '' in cur_dict: del cur_dict['']
+            frequency_dict[document.title] = cur_dict
+
+        path = os.path.join(self.get_path([self.paths["models"], name]), "frequencies.json")
+        ui.saveToJSON(frequency_dict, path)
+
+            
+
+        #preprocessed_text = nlp.preprocess_text(corpus)
+
     def generate_wordclouds(self):
         """
         Generates wordclouds for each text in a given corpus
@@ -67,7 +96,6 @@ class Driver:
         print("Generating wordclouds...")
         with mp.Pool(processes = 4) as p:
             list(tqdm(p.imap_unordered(self.generate_wordcloud_work, args), total = len(args)))
-        end = time.time()
 
 
     # ----------------------------------------------
