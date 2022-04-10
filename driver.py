@@ -75,9 +75,47 @@ class Driver:
         path = os.path.join(self.get_path([self.paths["models"], name]), "frequencies.json")
         ui.saveToJSON(frequency_dict, path)
 
-            
-
         #preprocessed_text = nlp.preprocess_text(corpus)
+
+    def generate_collocates(self):
+        """
+        Create collocate dictionary with a given string.
+        """
+        corpus, name = self.select_corpus()
+        if corpus is None: return
+        node_word = "earth"
+
+        collocate_dict = {}
+        for document in tqdm(corpus):
+            text = nlp.preprocess_text(document.text, stopwords=settings.stopwords)
+            text = [word for word in text if word != " " and word != ""]
+            cur_dict = nlp.create_collocate_dict(text, node_word, 6)
+            collocate_dict[document.title] = cur_dict
+
+        path = os.path.join(self.get_path([self.paths["models"], name]), f"{node_word}collocates.json")
+        ui.saveToJSON(collocate_dict, path)
+
+    def generate_MIscores(self):
+        """
+        Calculate MI score given a string. This could be iterative.
+        """
+        corpus, name = self.select_corpus()
+        if corpus is None: return
+        node_word = "earth"
+
+        frequency_path = self.get_path([self.paths['models'], name, 'frequencies.json'])
+        infile = open(frequency_path)
+        frequency_file = json.load(infile)
+        model_path = os.path.join(self.get_path([self.paths["models"], name]), f"{node_word}collocates.json")
+
+        infile = open(model_path)
+        collocate_file = json.load(infile)
+
+        collocates = nlp.merge_dict(collocate_file, True)
+        frequencies = nlp.merge_dict(frequency_file)
+        mi_scores = nlp.mi_scores(collocates, frequencies, node_word, 6)
+        save_path = os.path.join(self.get_path([self.paths["models"], name]), f"{node_word}MIscores.json")
+        ui.saveToJSON(dict({node_word : mi_scores}), save_path)
 
     def generate_wordclouds(self):
         """
