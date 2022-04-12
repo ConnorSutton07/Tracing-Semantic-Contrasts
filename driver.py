@@ -1,6 +1,6 @@
 import os
 import json
-from core import ui, settings
+from core import ui, settings, nlp 
 from core.text import Text
 from typing import List, Dict, Tuple
 from tqdm import tqdm
@@ -14,12 +14,14 @@ class Driver:
         self.paths["current"]   = os.getcwd()
         self.paths["corpora"]   = os.path.join(self.paths["current"], "corpora")
         self.paths["figures"]   = os.path.join(self.paths["current"], "figures")
+        self.paths["models"]    = os.path.join(self.paths["current"], "models")
 
         # list of methods that user will be able to choose from 
         self.modes = [
             ("Compare Across Corpora", self.inter_corpus_analysis),
             ("Compare Within Corpus",  self.intra_corpus_analysis),
             ("Generate Wordclouds",    self.generate_wordclouds),
+            ("Generate Models",     self.generate_models),
             ("Print Corpus Contents",  self.print_corpus_info)
         ]
 
@@ -50,6 +52,71 @@ class Driver:
     def intra_corpus_analysis(self):
         raise NotImplementedError
 
+    def generate_models(self):
+        """
+        Preprocesses text and saves a frequency dictionary to the
+        models directory
+
+        In the future, this could also generate the word embeddings
+
+        """
+        corpus, name = self.select_corpus()
+        if corpus is None: return
+
+        print("Creating word frequency dictionary...")
+        frequency_dict = dict()
+
+        for document in tqdm(corpus):
+            text = nlp.preprocess_text(document.text, stopwords = settings.stopwords)
+            cur_dict = nlp.create_frequency_dict(text)
+            if '' in cur_dict: del cur_dict['']
+            frequency_dict[document.title] = cur_dict
+
+        path = os.path.join(self.get_path([self.paths["models"], name]), "frequencies.json")
+        ui.saveToJSON(frequency_dict, path)
+
+        #preprocessed_text = nlp.preprocess_text(corpus)
+
+    def generate_collocates(self):
+        """
+        Create collocate dictionary with a given string.
+        """
+        corpus, name = self.select_corpus()
+        if corpus is None: return
+        node_word = "earth"
+
+        collocate_dict = {}
+        for document in tqdm(corpus):
+            text = nlp.preprocess_text(document.text, stopwords=settings.stopwords)
+            text = [word for word in text if word != " " and word != ""]
+            cur_dict = nlp.create_collocate_dict(text, node_word, 6)
+            collocate_dict[document.title] = cur_dict
+
+        path = os.path.join(self.get_path([self.paths["models"], name]), f"{node_word}collocates.json")
+        ui.saveToJSON(collocate_dict, path)
+
+    def generate_MIscores(self):
+        """
+        Calculate MI score given a string. This could be iterative.
+        """
+        corpus, name = self.select_corpus()
+        if corpus is None: return
+        node_word = "earth"
+
+        frequency_path = self.get_path([self.paths['models'], name, 'frequencies.json'])
+        infile = open(frequency_path)
+        frequency_file = json.load(infile)
+        model_path = os.path.join(self.get_path([self.paths["models"], name]), f"{node_word}collocates.json")
+
+        infile = open(model_path)
+        collocate_file = json.load(infile)
+
+        collocates = nlp.merge_dict(collocate_file, True)
+        frequencies = nlp.merge_dict(frequency_file)
+        mi_scores = nlp.mi_scores(collocates, frequencies, node_word, 6)
+        save_path = os.path.join(self.get_path([self.paths["models"], name]), f"{node_word}MIscores.json")
+        ui.saveToJSON(dict({node_word : mi_scores}), save_path)
+
     def generate_wordclouds(self):
         """
         Generates wordclouds for each text in a given corpus
@@ -67,7 +134,6 @@ class Driver:
         print("Generating wordclouds...")
         with mp.Pool(processes = 4) as p:
             list(tqdm(p.imap_unordered(self.generate_wordcloud_work, args), total = len(args)))
-        end = time.time()
 
 
     # ----------------------------------------------
