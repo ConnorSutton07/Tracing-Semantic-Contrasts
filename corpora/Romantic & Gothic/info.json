@@ -126,15 +126,6 @@
         "gender": "F"
     },
     {
-        "title": "The Works of Edgar Allan Poe",
-        "subtitle": "",
-        "author": "Edgar Allan Poe",
-        "year": 1849,
-        "type": "collection",
-        "file": "the_works_of_edgar_allan_poe.txt",
-        "gender": "M"
-    },
-    {
         "title": "Dracula",
         "subtitle": "",
         "author": "Bram Stoker",
@@ -196,5 +187,545 @@
         "type": "novel",
         "file": "north_and_south.txt",
         "gender": "F"
+    },
+    {
+        "title": "Elegy Written in a Country Churchyard",
+        "subtitle": "",
+        "author": "Thomas Gray",
+        "year": 1751,
+        "type": "poem",
+        "file": "elegy_written_in_a_country_churchyard.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Grave",
+        "subtitle": "",
+        "author": "Robert Blair",
+        "year": 1743,
+        "type": "poem",
+        "file": "the_grave.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Night-Thoughts",
+        "subtitle": "",
+        "author": "Edward Young",
+        "year": 1742,
+        "type": "poem",
+        "file": "night-thoughts.txt",
+        "gender": "M"
+    },
+    {
+        "title": "A Night-Piece on Death",
+        "subtitle": "",
+        "author": "Thomas Parnell",
+        "year": 1721,
+        "type": "poem",
+        "file": "a_night_piece_on_death.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Masque of the Red Death",
+        "subtitle": "",
+        "author": "Edgar Allan Poe",
+        "year": 1842,
+        "type": "short story",
+        "file": "the_masque_of_the_red_death.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Cask of Amontillado",
+        "subtitle": "",
+        "author": "Edgar Allan Poe",
+        "year": 1846,
+        "type": "short story",
+        "file": "the_cask_of_amontillado.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Raven",
+        "subtitle": "",
+        "author": "Edgar Allan Poe",
+        "year": 1845,
+        "type": "poem",
+        "file": "the_raven.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Narrative of Arthur Gordon Pym of Nantucket",
+        "subtitle": "",
+        "author": "Edgar Allan Poe",
+        "year": 1838,
+        "type": "novel",
+        "file": "the_narrative_of_arthur_gordon_pym_of_nantucket.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Mansfield Park",
+        "subtitle": "",
+        "author": "Jane Austen",
+        "year": 1814,
+        "type": "novel",
+        "file": "mansfield_park.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Emma",
+        "subtitle": "",
+        "author": "Jane Austen",
+        "year": 1815,
+        "type": "novel",
+        "file": "emma.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Persuasion",
+        "subtitle": "",
+        "author": "Jane Austen",
+        "year": 1817,
+        "type": "novel",
+        "file": "persuasion.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Poems, in Two Volumes",
+        "subtitle": "",
+        "author": "William Wordsworth",
+        "year": 1807,
+        "type": "anthology",
+        "file": "poems_in_two_volumes.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Eolian Harp",
+        "subtitle": "",
+        "author": "Samuel Taylor Coleridge",
+        "year": 1795,
+        "type": "poem",
+        "file": "the_eolian_harp.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Kubla Khan",
+        "subtitle": "",
+        "author": "Samuel Taylor Coleridge",
+        "year": 1816,
+        "type": "poem",
+        "file": "kubla_khan.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Frost at Midnight",
+        "subtitle": "",
+        "author": "Samuel Taylor Coleridge",
+        "year": 1798,
+        "type": "poem",
+        "file": "frost_at_midnight.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Nightingale",
+        "subtitle": "A Conversation Poem",
+        "author": "Samuel Taylor Coleridge",
+        "year": 1798,
+        "type": "poem",
+        "file": "the_nightingale.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Castles of Athlin and Dunbayne",
+        "subtitle": "A Highland Story",
+        "author": "Anne Radcliffe",
+        "year": 1789,
+        "type": "novel",
+        "file": "the_castles_of_athlin_and_dunbayne.txt",
+        "gender": "F"
+    },
+    {
+        "title": "A Sicilian Romance",
+        "subtitle": "",
+        "author": "Anne Radcliffe",
+        "year": 1790,
+        "type": "novel",
+        "file": "a_sicilian_romance.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Ivanhoe",
+        "subtitle": "A Romance",
+        "author": "Walter Scott",
+        "year": 1819,
+        "type": "novel",
+        "file": "ivanhoe.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Waverly",
+        "subtitle": "",
+        "author": "Walter Scott",
+        "year": 1814,
+        "type": "novel",
+        "file": "waverly.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Rob Roy",
+        "subtitle": "",
+        "author": "Walter Scott",
+        "year": 1817,
+        "type": "novel",
+        "file": "rob_roy.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Monk",
+        "subtitle": "A Romance",
+        "author": "Matthew Gregory Lewis",
+        "year": 1796,
+        "type": "novel",
+        "file": "the_monk.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Caleb Williams",
+        "subtitle": "Things As They Are",
+        "author": "William Godwin",
+        "year": 1794,
+        "type": "novel",
+        "file": "caleb_williams.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Children of the Abbey",
+        "subtitle": "",
+        "author": "Regina Maria Roche",
+        "year": 1796,
+        "type": "novel",
+        "file": "the_children_of_the_abbey.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Wieland",
+        "subtitle": "The Transformation",
+        "author": "Charles Brockden Brown",
+        "year": 1798,
+        "type": "novel",
+        "file": "wieland.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Don Juan",
+        "subtitle": "",
+        "author": "Lord Byron",
+        "year": 1819,
+        "type": "novel",
+        "file": "don_juan.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Childe Harold's Pilgrimage",
+        "subtitle": "",
+        "author": "Lord Byron",
+        "year": 1812,
+        "type": "poem",
+        "file": "childe_harolds_pilgrimage.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Vampyre",
+        "subtitle": "A Tale",
+        "author": "John William Polidori",
+        "year": 1819,
+        "type": "short story",
+        "file": "the_vampyre.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Adonais",
+        "subtitle": "An Elegy on the Death of John Keats",
+        "author": "Percy Bysshe Shelley",
+        "year": 1821,
+        "type": "poem",
+        "file": "adonais.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Witch of Atlas",
+        "subtitle": "",
+        "author": "Percy Bysshe Shelley",
+        "year": 1824,
+        "type": "poem",
+        "file": "the_witch_of_atlas.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Marriage of Heaven and Hell",
+        "subtitle": "",
+        "author": "William Blake",
+        "year": 1793,
+        "type": "novel",
+        "file": "the_marriage_of_heaven_and_hell.txt",
+        "gender": "M"
+    },
+    {
+        "title": "La Belle Dame Sans Merci",
+        "subtitle": "",
+        "author": "John Keats",
+        "year": 1819,
+        "type": "poem",
+        "file": "la_belle_dame_sans_merci.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Isabella",
+        "subtitle": "The Pot of Basil",
+        "author": "John Keats",
+        "year": 1818,
+        "type": "poem",
+        "file": "isabella.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Melmoth the Wanderer",
+        "subtitle": "",
+        "author": "Charles Maturin",
+        "year": 1820,
+        "type": "novel",
+        "file": "melmoth_the_wanderer.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Mummy",
+        "subtitle": "A Tale of the Twenty-Second Century",
+        "author": "Jane Webb",
+        "year": 1827,
+        "type": "novel",
+        "file": "the_mummy.txt",
+        "gender": "F"
+    },
+    {
+        "title": "The Devil's Elixirs",
+        "subtitle": "",
+        "author": "E.T.A. Hoffmann",
+        "year": 1815,
+        "type": "novel",
+        "file": "the_devils_elixir.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Three Musketeers",
+        "subtitle": "",
+        "author": "Alexandre Dumas",
+        "year": 1844,
+        "type": "novel",
+        "file": "the_three_musketeers.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Twenty Years After",
+        "subtitle": "",
+        "author": "Alexandre Dumas",
+        "year": 1845,
+        "type": "novel",
+        "file": "twenty_years_after.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Count of Monte Cristo",
+        "subtitle": "",
+        "author": "Alexandre Dumas",
+        "year": 1844,
+        "type": "novel",
+        "file": "the_count_of_monte_cristo.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Hunchback of Notre Dame",
+        "subtitle": "",
+        "author": "Victor Hugo",
+        "year": 1831,
+        "type": "novel",
+        "file": "the_hunchback_of_notre_dame.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Amber Witch",
+        "subtitle": "",
+        "author": "Wilhelm Meinhold",
+        "year": 1844,
+        "type": "novel",
+        "file": "the_amber_witch.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Picture of Dorian Gray",
+        "subtitle": "",
+        "author": "Oscar Wilde",
+        "year": 1890,
+        "type": "novel",
+        "file": "the_picture_of_dorian_gray.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Rider on the White Horse",
+        "subtitle": "",
+        "author": "Theodor Storm",
+        "year": 1888,
+        "type": "novella",
+        "file": "the_rider_on_the_white_horse.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Great Expectations",
+        "subtitle": "",
+        "author": "Charles Dickens",
+        "year": 1867,
+        "type": "novel",
+        "file": "great_expectations.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Oliver Twist",
+        "subtitle": "The Parish Boy's Progress",
+        "author": "Charles Dickens",
+        "year": 1838,
+        "type": "novel",
+        "file": "oliver_twist.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Villette",
+        "subtitle": "",
+        "author": "Charlotte Bronte",
+        "year": 1853,
+        "type": "novel",
+        "file": "villette.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Little Women",
+        "subtitle": "",
+        "author": "Louisa May Alcott",
+        "year": 1868,
+        "type": "novel",
+        "file": "little_women.txt",
+        "gender": "F"
+    },
+    {
+        "title": "The Mysteries of London",
+        "subtitle": "",
+        "author": "George W. M. Reynolds",
+        "year": 1844,
+        "type": "novel",
+        "file": "the_mysteries_of_london.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Varney, The Vampyre",
+        "subtitle": "The Feast of Blood",
+        "author": "James Rymer & Thomas Prest",
+        "year": 1847,
+        "type": "novel",
+        "file": "varney_the_vampyre.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Queen of Spades",
+        "subtitle": "And Other Stories",
+        "author": "Alexander Pushkin",
+        "year": 1834,
+        "type": "short story",
+        "file": "the_queen_of_spades.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Legend of Sleepy Hollow",
+        "subtitle": "",
+        "author": "Washington Irving",
+        "year": 1820,
+        "type": "novel",
+        "file": "the_legend_of_sleepy_hollow.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The Talisman",
+        "subtitle": "",
+        "author": "Walter Scott",
+        "year": 1825,
+        "type": "novel",
+        "file": "the_talisman.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Moby Dick",
+        "subtitle": "The Whale",
+        "author": "Herman Melville",
+        "year": 1851,
+        "type": "novel",
+        "file": "moby_dick.txt",
+        "gender": "M"
+    },
+    {
+        "title": "The House of the Seven Gables",
+        "subtitle": "",
+        "author": "Nathaniel Hawthorne",
+        "year": 1851,
+        "type": "novel",
+        "file": "the_house_of_the_seven_gables.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Lodore",
+        "subtitle": "",
+        "author": "Mary Shelley",
+        "year": 1835,
+        "type": "novel",
+        "file": "lodore.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Indiana",
+        "subtitle": "",
+        "author": "Amantine Aurore Dupin",
+        "year": 1832,
+        "type": "novel",
+        "file": "indiana.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Antonia",
+        "subtitle": "",
+        "author": "Amantine Aurore Dupin",
+        "year": 1863,
+        "type": "novel",
+        "file": "antonia.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Mauprat",
+        "subtitle": "",
+        "author": "Amantine Aurore Dupin",
+        "year": 1837,
+        "type": "novel",
+        "file": "mauprat.txt",
+        "gender": "F"
+    },
+    {
+        "title": "Les Miserables",
+        "subtitle": "",
+        "author": "Victor Hugo",
+        "year": 1862,
+        "type": "novel",
+        "file": "les_miserables.txt",
+        "gender": "M"
+    },
+    {
+        "title": "Eugene Onegin",
+        "subtitle": "",
+        "author": "Alexander Pushkin",
+        "year": 1833,
+        "type": "novel",
+        "file": "eugene_onegin.txt",
+        "gender": "M"
     }
 ]
