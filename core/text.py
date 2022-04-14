@@ -1,13 +1,17 @@
 from wordcloud import WordCloud
 from typing import List
-import os
+import os.path as osp
+from core import nlp 
+from core import settings
+import json
 
 class Text:
     __slots__ = ['__dict__', 'title', 'author', 'year', 'type', 'file', 'gender']
     def __init__(self, path: str, **kwargs):
         for k, v in kwargs.items(): 
             if k in self.__slots__: setattr(self, k, v)
-        self.text = self.load_text(os.path.join(path, self.file))
+        self.path = path
+        self.text = self.load_text(osp.join(self.path, self.file))
     
     def get_info(self) -> None:
         return f"Author: {self.author}\nTitle:  {self.title}\nYear:   {self.year}"
@@ -27,3 +31,16 @@ class Text:
     def load_text(file: str) -> str:
         with open(file, encoding = 'utf8') as f: contents = f.read()
         return contents
+
+    def preprocess(self) -> List[str]:
+        preprocessed_text = nlp.preprocess_text(self.text, stopwords = settings.stopwords)
+        with open(osp.join(self.path, 'preprocessed', self.file), 'w', encoding = 'utf8') as f: 
+            json.dump(preprocessed_text, f)
+
+    def preprocessed_text(self) -> List[str]:
+        path = osp.join('preprocessed')
+        if not osp.exists(osp.join(self.path, 'preprocessed', self.file)):
+            self.preprocess()
+        with open(osp.join(self.path, 'preprocessed', self.file), 'r',encoding = 'utf8') as f: 
+            contents = json.load(f)
+        return contents 
