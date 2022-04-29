@@ -53,7 +53,19 @@ class Driver:
         raise NotImplementedError 
 
     def intra_corpus_analysis(self):
-        raise NotImplementedError
+        """
+        Compare corpus based on data such as author, gender, etc.
+        """
+        corpus, name = self.select_corpus()
+        name1, name2, fun1, fun2 = self.select_analysis_topics()
+        part1 = [txt for txt in corpus if fun1(txt)]
+        part2 = [txt for txt in corpus if fun2(txt)]
+        query = input('Word: ')
+        
+        self.generate_intra_MIscores(name, corpus, name1, part1, query)
+        self.generate_intra_MIscores(name, corpus, name2, part2, query)
+
+
 
     def generate_data(self):
         """
@@ -126,6 +138,32 @@ class Driver:
         mi_scores = nlp.mi_scores(collocates, frequencies, query, 4)
         save_path = os.path.join(self.get_path([self.paths["data"], name]), f"{query}_MIscores.json")
         ui.saveToJSON(dict({query : mi_scores}), save_path)
+
+    def generate_intra_MIscores(self, name, corpus, part_name, part, query):
+        """
+        Calculate the MI score of a given partition of a corpus
+        """
+
+        frequency_path = self.get_path([self.paths['data'], name, 'frequencies.json'])
+        infile = open(frequency_path)
+        frequency_file = json.load(infile)
+        frequency_file = {txt.title:frequency_file[txt.title] for txt in part} 
+        model_path = os.path.join(self.get_path([self.paths["data"], name]), f"{query}_collocates.json")
+
+        if not os.path.isfile(model_path): self.generate_collocates(query, corpus, name)
+
+        with open(model_path, 'r') as f:
+            collocate_file = json.load(f)
+
+        collocate_file = {txt.title:collocate_file[txt.title] for txt in part if txt.title in
+                collocate_file.keys()}
+        collocates = nlp.merge_dict(collocate_file, True)
+        frequencies = nlp.merge_dict(frequency_file)
+        mi_scores = nlp.mi_scores(collocates, frequencies, query, 4)
+        save_path = os.path.join(self.get_path([self.paths["data"], name, part_name]), f"{query}_MIscores.json")
+        ui.saveToJSON(dict({query : mi_scores}), save_path)
+
+
 
     def generate_wordclouds(self):
         """
@@ -285,5 +323,26 @@ class Driver:
             return self.retrieve_texts(info, corpus_path), corpora[choice]
         return None # user has chosen to go back
 
-
+    def select_analysis_topics(self):
+        """
+        Selects what to analyze a corpus based on
+        """
+        parts = ["Gender"]
+        gens = ['Generate MI Scores']
+        print('How should the corpus be partitioned:')
+        for i, part in enumerate(parts, start = 1):
+            print(f'\t{i}) {part}')
+        part = ui.getValidInput('', dtype = int, valid=range(1, len(parts) + 1)) - 1
+        if part == 0:
+            name1 = 'men'
+            name2 = 'women'
+            fun1 = lambda txt : txt.gender == 'M'
+            fun2 = lambda txt : txt.gender == 'F'
+        '''
+        print('What should be generated:')
+        for i, gen in enumerate(gens, start = 1):
+            print(f'\t{i}) {gen}')
+        part = ui.getValidInput('> ', dtype = int, valid=range(1, len(gens) + 1)) - 1
+        '''     
+        return name1, name2, fun1, fun2
             
