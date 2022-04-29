@@ -327,7 +327,7 @@ class Driver:
         """
         Selects what to analyze a corpus based on
         """
-        parts = ["Gender"]
+        parts = ["Gender", "Year"]
         gens = ['Generate MI Scores']
         print('How should the corpus be partitioned:')
         for i, part in enumerate(parts, start = 1):
@@ -338,6 +338,20 @@ class Driver:
             name2 = 'women'
             fun1 = lambda txt : txt.gender == 'M'
             fun2 = lambda txt : txt.gender == 'F'
+        elif part == 1:
+            range1, range2 = [0,0], [0,0]
+            range1[0] = ui.getValidInput('Oldest year in first range', dtype = int,
+                valid=range(1700,1900))
+            range1[1] = ui.getValidInput('Newest year in first range', dtype = int,
+                valid=range(1700,1900))
+            range2[0] = ui.getValidInput('Oldest year in second range', dtype = int,
+                valid=range(1700,1900))
+            range2[1] = ui.getValidInput('Newest year in second range', dtype = int,
+                valid=range(1700,1900))
+            name1 = f'{range1[0]}-{range1[1]}'
+            name2 = f'{range2[0]}-{range2[1]}'
+            fun1 = lambda txt : txt.year >= range1[0] and txt.year <= range1[1]
+            fun2 = lambda txt : txt.year >= range2[0] and txt.year <= range2[1]
         '''
         print('What should be generated:')
         for i, gen in enumerate(gens, start = 1):
