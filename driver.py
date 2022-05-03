@@ -1,3 +1,4 @@
+from ast import keyword
 import os
 import json
 from core import ui, settings, nlp 
@@ -25,7 +26,8 @@ class Driver:
             ("Generate data",     self.generate_data),
             ("Print Corpus Contents",  self.print_corpus_info),
             ("Plot Documents by Decade", self.plot_documents_by_decade),
-            ("Generate Mutual Information Scores", self.generate_MIscores)
+            ("Generate Mutual Information Scores", self.generate_MIscores),
+            ("Automate Mutual Information Scores", self.generate_MIscores_withdict)
         ]
 
         self.introduction()
@@ -112,7 +114,7 @@ class Driver:
         collocates = [x[1] for x in data if x[1]]
         collocate_dict = dict(zip(titles, collocates))
 
-        path = os.path.join(self.get_path([self.paths["data"], name]), f"{query}_collocates.json")
+        path = os.path.join(self.get_path([self.paths["data"], name, "collocates"]), f"{query}_collocates.json")
         ui.saveToJSON(collocate_dict, path)
 
     def generate_MIscores(self):
@@ -121,6 +123,7 @@ class Driver:
         """
         corpus, name = self.select_corpus()
         if corpus is None: return
+        
         query = input("Word: ")
 
         frequency_path = self.get_path([self.paths['data'], name, 'frequencies.json'])
@@ -138,6 +141,42 @@ class Driver:
         mi_scores = nlp.mi_scores(collocates, frequencies, query, 4)
         save_path = os.path.join(self.get_path([self.paths["data"], name]), f"{query}_MIscores.json")
         ui.saveToJSON(dict({query : mi_scores}), save_path)
+
+    def generate_MIscores_withdict(self):
+        """
+        Calculate MI score for a dictionary. Stored in separate json files featuring categories of study with their respective keywords and MI scores.
+        """
+        corpus, name = self.select_corpus()
+        if corpus is None: return
+        
+        keywords = {"Religion&Philosophy": ["sin", "church", "god", "holy", "pray","hell", "heaven", "salvation", "curse", "evil", "fear", "vision", "creation", "death"],
+                    "Mankind&Identity": ["human", "self", "person", "universe", "feel", "pain", "suffer", "friend", "ego", "think", "reason", "ignorant"],
+                    "Ethics&Crime": ["moral", "steal", "thief", "kill", "murder", "adultery", "spy", "envy", "greed", "desire", "give"],
+                    "Government&Politics": ["government", "king", "queen", "power", "poverty", "rank", "noble", "rich", "war", "justice", "law", "treason"],
+                    "Family&Gender": ["man", "woman", "father", "mother", "daughter", "son", "sister", "brother", "child", "home", "sex", "community"],
+                    "Nature": ["earth", "sun", "forest", "castle", "moon", "outerspace", "world", "nature"]
+                    }
+        for category, values in keywords.items():
+            mi_score_dicts = []
+            for word in values:
+                query = word
+
+                frequency_path = self.get_path([self.paths['data'], name, 'frequencies.json'])
+                infile = open(frequency_path)
+                frequency_file = json.load(infile)
+                model_path = os.path.join(self.get_path([self.paths["data"], name, "collocates"]), f"{query}_collocates.json")
+
+                if not os.path.isfile(model_path): self.generate_collocates(query, corpus, name)
+
+                with open(model_path, 'r') as f:
+                    collocate_file = json.load(f)
+
+                collocates = nlp.merge_dict(collocate_file, True)
+                frequencies = nlp.merge_dict(frequency_file)
+                mi_scores = nlp.mi_scores(collocates, frequencies, query, 4)
+                mi_score_dicts.append(dict({query : mi_scores}))
+            save_path = os.path.join(self.get_path([self.paths["data"], name]), f"{category}_MIscores.json")
+            ui.saveToJSON(dict({category : mi_score_dicts}), save_path)
 
     def generate_intra_MIscores(self, name, corpus, part_name, part, query):
         """

@@ -1,0 +1,71 @@
+{
+    "The Old English Baron": {
+        "guilty": 1,
+        "black": 1,
+        "crime": 1,
+        "god": 1,
+        "know": 1,
+        "innocence": 1
+    },
+    "The Marriage of Heaven and Hell": {
+        "law": 1,
+        "woman": 1,
+        "taken": 1,
+        "steal": 1,
+        "labour": 1,
+        "others": 1
+    },
+    "Don Juan": {
+        "call": 1,
+        "gallantry": 1,
+        "god": 2,
+        "much": 1,
+        "common": 1,
+        "climate": 1,
+        "innocent": 1,
+        "flirtation": 1,
+        "quite": 1,
+        "adulteration": 1,
+        "ye": 1
+    },
+    "Ivanhoe": {
+        "earl": 1,
+        "haste": 1,
+        "hell": 1,
+        "sacrilege": 1,
+        "oppression": 1,
+        "barbarous": 1
+    },
+    "Indiana": {
+        "respected": 1,
+        "influence": 1,
+        "seduction": 1,
+        "safety": 1,
+        "find": 1,
+        "henceforth": 1
+    },
+    "The Hunchback of Notre Dame": {
+        "fornication": 1,
+        "libertine": 1,
+        "thought": 1,
+        "prying": 1,
+        "pleasure": 1,
+        "others": 1
+    },
+    "The Amber Witch": {
+        "deny": 1,
+        "thing": 1,
+        "murder": 1,
+        "theft": 1,
+        "called": 1,
+        "argumentum": 1
+    },
+    "The Mysteries of London": {
+        "calculated": 1,
+        "encourage": 1,
+        "fornication": 1,
+        "descendant": 1,
+        "george": 1,
+        "second": 1
+    }
+}

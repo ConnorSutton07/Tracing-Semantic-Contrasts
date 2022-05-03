@@ -74,7 +74,7 @@ def mi_scores(connocates: Dict[str,int], word_frequencies: Dict[str,int], node_w
     for collocate, near_count in connocates.items():
         collocate_count = word_frequencies.get(collocate)
         score = np.log((near_count * corpus_size)/(node_count * collocate_count * span)) / np.log(2)
-        mi_scores[collocate] = score
-    mi_scores = {key:val for key, val in mi_scores.items() if val > 1}
+        mi_scores[collocate] = np.round(score, 2)
+    mi_scores = {key:val for key, val in mi_scores.items() if val > 2.5}
     return dict(sorted(mi_scores.items(), key=lambda x: x[1], reverse=True))
 
