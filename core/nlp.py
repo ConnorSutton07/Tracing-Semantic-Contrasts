@@ -2,13 +2,11 @@ from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords as stopwords_model
 from functools import lru_cache
-from typing import List, Dict
+from typing import List, Dict, Set
 import re
 from unidecode import unidecode
 import numpy as np
 
-STOPWORDS = set(stopwords_model.words('english'))
-REMOVE_PTN = re.compile(r'[^a-z]+')
 
 def tokenize(text: str) -> List[str]:
     return word_tokenize(text)
@@ -18,18 +16,24 @@ def lemmatize(word: str) -> str:
     return WordNetLemmatizer().lemmatize(word)
 
 def filter_text(text: str) -> str:
+    REMOVE_PTN = re.compile(r'[^a-z]+')
     return re.sub(REMOVE_PTN, lambda m: ' ', unidecode(text).lower())
 
 def valid_token(token: str) -> bool:
     return token not in STOPWORDS and len(token) > 1
 
-def preprocess_text(text: str) -> List[str]:
+def preprocess_text(text: str, stopwords: Set[str]) -> List[str]:
     """ 
     Prepares text to be analyzed
     Tokenizes, lemmatizes, and removes stopwords
 
     """
-    return [lemmatize(token) for token in tokenize(filter_text(text)) if valid_token(token)]
+    filtered = filter_text(text)
+    tokens = tokenize(filtered)
+    cleaned = [w for w in tokens if token not in stopwords]
+    lemmatized = [lemmatize(w) for w in cleaned]
+    return [w for w in lemmatized if len(w) > 1]
+    # return [lemmatize(token) for token in tokenize(filter_text(text)) if valid_token(token)]
 
 
 def create_frequency_dict(text: List[str]) -> Dict[str, int]:
@@ -77,4 +81,3 @@ def mi_scores(connocates: Dict[str,int], word_frequencies: Dict[str,int], node_w
         mi_scores[collocate] = score
     mi_scores = {key:val for key, val in mi_scores.items() if val > 1}
     return dict(sorted(mi_scores.items(), key=lambda x: x[1], reverse=True))
-
