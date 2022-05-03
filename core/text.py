@@ -38,7 +38,6 @@ class Text:
             json.dump(preprocessed_text, f)
 
     def preprocessed_text(self) -> List[str]:
-        path = osp.join('preprocessed')
         if not osp.exists(osp.join(self.path, 'preprocessed', self.file)):
             self.preprocess()
         with open(osp.join(self.path, 'preprocessed', self.file), 'r',encoding = 'utf8') as f: 

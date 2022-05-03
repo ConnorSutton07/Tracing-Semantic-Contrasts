@@ -1,13 +1,15 @@
 from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords as stopwords_model
+from core import settings
 from functools import lru_cache
 from typing import List, Dict
 import re
 from unidecode import unidecode
 import numpy as np
+from gensim.models.fasttext import FastText
+from sklearn.decomposition import PCA
 
-STOPWORDS = set(stopwords_model.words('english'))
+STOPWORDS = settings.stopwords
 REMOVE_PTN = re.compile(r'[^a-z]+')
 
 def tokenize(text: str) -> List[str]:
@@ -77,4 +79,15 @@ def mi_scores(connocates: Dict[str,int], word_frequencies: Dict[str,int], node_w
         mi_scores[collocate] = score
     mi_scores = {key:val for key, val in mi_scores.items() if val > 1}
     return dict(sorted(mi_scores.items(), key=lambda x: x[1], reverse=True))
+
+def word_embeddings(corpus: list):
+    key_words = settings.key_words
+    model = FastText(corpus, window=20)
+    words = {words: [item[0] for item in model.wv.most_similar([words], topn = 3)] for words in key_words}
+    words = np.array(sum([[k] + v for k, v in words.items()], []))
+    vectors = model.wv[words]
+    reduced_model = PCA(n_components = 2)
+    principal_components = reduced_model.fit_transform(vectors)
+    variance_ratio = reduced_model.explained_variance_ratio_
+    return words, principal_components, variance_ratio
 

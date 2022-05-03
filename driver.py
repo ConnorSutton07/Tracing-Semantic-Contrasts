@@ -1,5 +1,8 @@
 import os
 import json
+from re import A
+
+from attr import asdict
 from core import ui, settings, nlp 
 from core.text import Text
 from typing import List, Dict, Tuple
@@ -9,6 +12,9 @@ import multiprocessing as mp
 import numpy as np
 import time 
 
+
+from adjustText import adjust_text
+
 class Driver:
     def __init__(self) -> None:
         self.paths = {}
@@ -17,15 +23,21 @@ class Driver:
         self.paths["figures"]   = os.path.join(self.paths["current"], "figures")
         self.paths["data"]    = os.path.join(self.paths["current"], "data")
 
-        # list of methods that user will be able to choose from 
+        # list of functions that user will be able to choose from 
         self.modes = [
             ("Compare Across Corpora", self.inter_corpus_analysis),
             ("Compare Within Corpus",  self.intra_corpus_analysis),
-            ("Generate Wordclouds",    self.generate_wordclouds),
             ("Generate data",     self.generate_data),
             ("Print Corpus Contents",  self.print_corpus_info),
             ("Plot Documents by Decade", self.plot_documents_by_decade),
             ("Generate Mutual Information Scores", self.generate_MIscores)
+        ]
+        
+        # list of analysis methods that user will be able to choose from 
+        self.analysis = [
+            "Mutual Information Scores for specific data",
+            "Word Embeddings",
+            "Wordclouds"
         ]
 
         self.introduction()
@@ -53,19 +65,40 @@ class Driver:
         raise NotImplementedError 
 
     def intra_corpus_analysis(self):
+        corpus, name = self.select_corpus()
+        if corpus is None: return
+        choice = self.select_analysis_method()
+        if choice is None: return
+        if (choice == 0): self.intra_MIscore(corpus, name)
+        elif (choice == 1): self.analyze_vectors(name)
+        elif (choice == 2): self.generate_wordclouds()
+
+    
+    def intra_MIscore(self, corpus, name):
         """
         Compare corpus based on data such as author, gender, etc.
         """
-        corpus, name = self.select_corpus()
-        name1, name2, fun1, fun2 = self.select_analysis_topics()
+        name1, name2, fun1, fun2 = self.select_analysis_topics_MIscore()
         part1 = [txt for txt in corpus if fun1(txt)]
         part2 = [txt for txt in corpus if fun2(txt)]
         query = input('Word: ')
         
         self.generate_intra_MIscores(name, corpus, name1, part1, query)
-        self.generate_intra_MIscores(name, corpus, name2, part2, query)
+        self.generate_intra_MIscores(name, corpus, name2, part2, query) 
 
-
+    def analyze_vectors(self, corpus_name: str):
+        corpus = []
+        path = self.get_path([self.paths["corpora"], corpus_name, 'preprocessed'])
+        for text in os.listdir(path):
+            with open(os.path.join(path, text)) as infile: corpus += infile.read()
+        print("Creating embeddings...")
+        if (" " in corpus): return
+        words, pca, variance_ratio = nlp.word_embeddings(corpus)
+        words, indices = np.unique(words, return_index=True)
+        pca = pca[indices]
+        print(words)
+        self.vector_plot(False, pca, corpus_name, words)
+        print("Variance ratio:", variance_ratio[0], "-", variance_ratio[1])
 
     def generate_data(self):
         """
@@ -188,6 +221,38 @@ class Driver:
     #              Utility Methods
     #-----------------------------------------------
 
+    def vector_plot(self, d3: bool, pca, corpus_name: str, words: List[str]):
+        plt.figure(figsize=(12, 8))
+        plt.title(f"Word Embeddings | Corpus: {corpus_name}") 
+        if (d3):
+            points = np.zeros( (len(pca[:, 0]), 3) )
+            for i, (x, y, z) in enumerate(zip(pca[:, 0], pca[:, 1], pca[:, 2])):
+                x = (x - min(pca[:, 0])) / (max(pca[:, 0]) - min(pca[:, 0]))
+                y = (y - min(pca[:, 1])) / (max(pca[:, 1]) - min(pca[:, 1]))
+                z = (y - min(pca[:, 2])) / (max(pca[:, 2]) - min(pca[:, 2]))
+                points[i] = np.array([x, y, z])
+            plt.figure(figsize=(12, 8))
+            ax = plt.axes(projection ="3d")
+            for i in range(len(points[:, 0])):
+                ax.scatter(points[i,0], points[i,1], points[i,2], color='b') 
+                ax.text(points[i,0], points[i,1], points[i,2],  '%s' % (words[i]), size=20, zorder=1,  
+                color='k') 
+            
+        else:
+            points = np.zeros( (len(pca[:, 0]), 2) )
+            for i, (x, y) in enumerate(zip(pca[:, 0], pca[:, 1])):
+                x = (x - min(pca[:, 0])) / (max(pca[:, 0]) - min(pca[:, 0]))
+                y = (y - min(pca[:, 1])) / (max(pca[:, 1]) - min(pca[:, 1]))
+                points[i] = np.array([x, y])
+            plt.scatter(points[:, 0], points[:, 1])
+            annotations = []
+            for word, x, y in zip(words, points[:, 0], points[:, 1]):
+                annotations.append(plt.annotate(word, xy=(x+0.015, y-0.005), xytext=(0, 0), textcoords='offset points'))
+            adjust_text(annotations, lim=10)
+        plot_save_path = os.path.join(self.paths["figures"], corpus_name, "embeddings.jpg")
+        plt.savefig(plot_save_path, dpi=200)
+
+
     def generate_collocate_work(self, args: Tuple[Text, str]):
         document, query = args
         text = document.preprocessed_text() # nlp.preprocess_text(document.text, stopwords=settings.stopwords)
@@ -290,12 +355,15 @@ class Driver:
             1) Compare Across Corpora (e.g., Greek vs. Rennaissance)
             2) Compare Within Corpus (e.g., Male vs Female Romanticists)
             3) Generate Wordclouds
-            4) Print Corpus Contents
-            5) Exit
+            4) Generate data
+            5) Print Corpus Contents
+            6) Plot Documents by Decade
+            7) Generate Mutual Information Scores
+            8) Exit
 
         """
         num_modes = len(self.modes)
-        msg = "Analysis Method:\n" 
+        msg = "Select Mode:\n" 
         for i, mode in enumerate(self.modes, start = 1): # list the modes
             msg += f"   {i}) {mode[0]}\n"
         msg += f"   {num_modes + 1}) Exit" 
@@ -323,7 +391,22 @@ class Driver:
             return self.retrieve_texts(info, corpus_path), corpora[choice]
         return None # user has chosen to go back
 
-    def select_analysis_topics(self):
+
+    def select_analysis_method(self):
+        """
+        Selects what method to use for the analysis
+        """
+        num_methods = len(self.analysis)
+        msg = "Select Analysis Method:\n"
+        for i, corpus in enumerate(self.analysis, start = 1): # list methods for user to choose from
+            msg += f"   {i}) {corpus}\n"
+        msg += f"   {num_methods + 1}) Back"
+        choice = ui.getValidInput(msg, dtype = int, valid = range(1, num_methods + 1)) - 1
+        if (choice != num_methods):
+            return choice
+        return None # user has chosen to go back
+
+    def select_analysis_topics_MIscore(self):
         """
         Selects what to analyze a corpus based on
         """
