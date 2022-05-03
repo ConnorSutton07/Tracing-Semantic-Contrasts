@@ -129,7 +129,7 @@ class Driver:
         frequency_path = self.get_path([self.paths['data'], name, 'frequencies.json'])
         infile = open(frequency_path)
         frequency_file = json.load(infile)
-        model_path = os.path.join(self.get_path([self.paths["data"], name]), f"{query}_collocates.json")
+        model_path = os.path.join(self.get_path([self.paths["data"], name, "collocates"]), f"{query}_collocates.json")
 
         if not os.path.isfile(model_path): self.generate_collocates(query, corpus, name)
 
@@ -187,7 +187,7 @@ class Driver:
         infile = open(frequency_path)
         frequency_file = json.load(infile)
         frequency_file = {txt.title:frequency_file[txt.title] for txt in part} 
-        model_path = os.path.join(self.get_path([self.paths["data"], name]), f"{query}_collocates.json")
+        model_path = os.path.join(self.get_path([self.paths["data"], name, "collocates"]), f"{query}_collocates.json")
 
         if not os.path.isfile(model_path): self.generate_collocates(query, corpus, name)
 
