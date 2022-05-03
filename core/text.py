@@ -1,8 +1,7 @@
 from wordcloud import WordCloud
-from typing import List
+from typing import List, Set
 import os.path as osp
 from core import nlp 
-from core import settings
 import json
 
 class Text:
@@ -22,7 +21,8 @@ class Text:
     def generate_wordcloud(self, size: int, stopwords: List[str]) -> WordCloud:
         return WordCloud(
             stopwords = stopwords, 
-            background_color = "white",
+            background_color = "black",
+            colormap = 'spring',
             width = size[0], 
             height = size[1]
         ).generate(self.text)
@@ -32,15 +32,15 @@ class Text:
         with open(file, encoding = 'utf8') as f: contents = f.read()
         return contents
 
-    def preprocess(self) -> List[str]:
-        preprocessed_text = nlp.preprocess_text(self.text, stopwords = settings.stopwords)
+    def preprocess(self, stopwords: Set[str]) -> List[str]:
+        preprocessed_text = nlp.preprocess_text(self.text, stopwords = stopwords)
         with open(osp.join(self.path, 'preprocessed', self.file), 'w', encoding = 'utf8') as f: 
             json.dump(preprocessed_text, f)
 
-    def preprocessed_text(self) -> List[str]:
+    def preprocessed_text(self, stopwords: Set[str]) -> List[str]:
         path = osp.join('preprocessed')
         if not osp.exists(osp.join(self.path, 'preprocessed', self.file)):
-            self.preprocess()
+            self.preprocess(stopwords)
         with open(osp.join(self.path, 'preprocessed', self.file), 'r',encoding = 'utf8') as f: 
             contents = json.load(f)
         return contents 

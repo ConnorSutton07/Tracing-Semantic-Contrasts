@@ -1,13 +1,14 @@
 import os
 import json
-from core import ui, settings, nlp 
+from core import ui, nlp 
 from core.text import Text
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Set
 from tqdm import tqdm
 import matplotlib.pyplot as plt 
 import multiprocessing as mp 
 import numpy as np
 import time 
+from nltk.corpus import stopwords as stopwords_model
 
 class Driver:
     def __init__(self) -> None:
@@ -17,6 +18,8 @@ class Driver:
         self.paths["figures"]   = os.path.join(self.paths["current"], "figures")
         self.paths["data"]    = os.path.join(self.paths["current"], "data")
 
+        self.stopwords = self.create_stopwords()
+        
         # list of methods that user will be able to choose from 
         self.modes = [
             ("Compare Across Corpora", self.inter_corpus_analysis),
@@ -70,7 +73,7 @@ class Driver:
         frequency_dict = dict()
 
         for document in tqdm(corpus):
-            text = document.preprocessed_text() #nlp.preprocess_text(document.text, stopwords = settings.stopwords)
+            text = document.preprocessed_text(self.stopwords) #nlp.preprocess_text(document.text, stopwords = settings.stopwords)
             cur_dict = nlp.create_frequency_dict(text)
             if '' in cur_dict: del cur_dict['']
             frequency_dict[document.title] = cur_dict
@@ -145,19 +148,17 @@ class Driver:
         with mp.Pool(processes = 4) as p:
             list(tqdm(p.imap_unordered(self.generate_wordcloud_work, args), total = len(args)))
 
-
     # ----------------------------------------------
     #              Utility Methods
     #-----------------------------------------------
 
     def generate_collocate_work(self, args: Tuple[Text, str]):
         document, query = args
-        text = document.preprocessed_text() # nlp.preprocess_text(document.text, stopwords=settings.stopwords)
+        text = document.preprocessed_text(self.stopwords) # nlp.preprocess_text(document.text, stopwords=settings.stopwords)
         text = [word for word in text if word != " " and word != ""]
         cur_dict = nlp.create_collocate_dict(text, query, 6)
         #collocate_dict[document.title] = cur_dict
         return document.title, cur_dict
-
 
 
     def generate_wordcloud_work(self, args: Tuple[Text, str]):
@@ -168,8 +169,9 @@ class Driver:
         """
         text, path = args
         fig = plt.figure()
+        fig.patch.set_facecolor('black')
         plt.imshow(text.generate_wordcloud(
-            stopwords = settings.stopwords,
+            stopwords = self.stopwords,
             size = (600, 600)),
             interpolation = 'bilinear',
             cmap = 'Paired'
@@ -241,6 +243,13 @@ class Driver:
             plt.show()
             plt.close()
 
+    @staticmethod
+    def create_stopwords() -> Set[str]:
+        STOPWORDS = set(stopwords_model.words('english'))
+        STOPWORDS = STOPWORDS | {"ye", "thy", "thee", "hast", "thou", "o'er", "hath", "thine", "chapter", "twas", "said", "would", "could", "upon", "shall", "like"}
+        # STOPWORDS = STOPWORDS - {"he", "she"}
+        return STOPWORDS
+
     # ----------------------------------------------
     #                UI Methods
     #-----------------------------------------------
@@ -273,11 +282,14 @@ class Driver:
         """
         corpora: List[str] = os.listdir(path = self.paths['corpora']) # retrieve list of subdirectories in corpora directory
         num_corpora = len(corpora)
-        msg = "Select Corpus:\n"
-        for i, corpus in enumerate(corpora, start = 1): # list corpora for user to choose from
-            msg += f"   {i}) {corpus}\n"
-        msg += f"   {num_corpora + 1}) Back"
-        choice = ui.getValidInput(msg, dtype = int, valid = range(1, num_corpora + 2)) - 1
+        if num_corpora == 1:
+            choice = 0
+        else:
+            msg = "Select Corpus:\n"
+            for i, corpus in enumerate(corpora, start = 1): # list corpora for user to choose from
+                msg += f"   {i}) {corpus}\n"
+            msg += f"   {num_corpora + 1}) Back"
+            choice = ui.getValidInput(msg, dtype = int, valid = range(1, num_corpora + 2)) - 1
         if choice != num_corpora:
             corpus_path = os.path.join(self.paths['corpora'], corpora[choice]) # find info.json
             # open info.json and read its contents into 'info'
