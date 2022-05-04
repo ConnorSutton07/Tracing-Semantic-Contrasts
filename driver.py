@@ -24,18 +24,27 @@ class Driver:
 
         self.stopwords = self.create_stopwords()
         
-        # list of methods that user will be able to choose from 
+        # # list of methods that user will be able to choose from 
+        # self.modes = [
+        #     ("Compare Across Corpora", self.inter_corpus_analysis),
+        #     ("Compare Within Corpus",  self.intra_corpus_analysis),
+        #     ("Create Embeddings",      self.embeddings),
+        #     ("Generate Mutual Information Scores", self.generate_MIscores),
+        #     ("Automate Mutual Information Scores", self.generate_MIscores_withdict),
+        #     ("Print Corpus Contents",  self.print_corpus_info),
+        #     ("Generate Wordclouds",    self.generate_wordclouds),
+        #     ("Preprocess data",        self.generate_data),
+        #     ("Plot Documents by Decade", self.plot_documents_by_decade)
+        # ]
         self.modes = [
-            ("Compare Across Corpora", self.inter_corpus_analysis),
-            ("Compare Within Corpus",  self.intra_corpus_analysis),
-            ("Create Embeddings",      self.embeddings),
-            ("Generate Mutual Information Scores", self.generate_MIscores),
-            ("Automate Mutual Information Scores", self.generate_MIscores_withdict),
+            ("Analyze Entire Corpus", self.entire_corpus_analysis),
+            ("Analyze Split Corpus",  self.split_corpus_analysis),
+            ("Preprocess Text",     self.generate_data),
             ("Print Corpus Contents",  self.print_corpus_info),
-            ("Generate Wordclouds",    self.generate_wordclouds),
-            ("Preprocess data",        self.generate_data),
-            ("Plot Documents by Decade", self.plot_documents_by_decade)
+            ("Plot Documents by Decade", self.plot_documents_by_decade),
+            ("Generate Mutual Information Scores", self.generate_MIscores)
         ]
+
 
         self.keywords = {
             "Religion & Philosophy": 
@@ -73,10 +82,16 @@ class Driver:
     #              Analysis Methods
     #-----------------------------------------------
 
-    def inter_corpus_analysis(self):
-        raise NotImplementedError 
+    def entire_corpus_analysis(self):
+        corpus, name = self.select_corpus()
+        if corpus is None: return
+        choice = self.select_analysis_method()
+        if choice is None: return
+        if (choice == 0): self.intra_MIscore(corpus, name)
+        elif (choice == 1): self.analyze_vectors(name)
+        elif (choice == 2): self.generate_wordclouds()
 
-    def intra_corpus_analysis(self):
+    def split_corpus_analysis(self):
         """
         Compare corpus based on data such as author, gender, etc.
         """
@@ -444,6 +459,20 @@ class Driver:
             # open info.json and read its contents into 'info'
             with open(os.path.join(corpus_path, 'info.json')) as infile: info = json.load(infile) 
             return self.retrieve_texts(info, corpus_path), corpora[choice]
+        return None # user has chosen to go back
+
+    def select_analysis_method(self):
+        """
+        Selects what method to use for the analysis
+        """
+        num_methods = len(self.analysis)
+        msg = "Select Analysis Method:\n"
+        for i, corpus in enumerate(self.analysis, start = 1): # list methods for user to choose from
+            msg += f"   {i}) {corpus}\n"
+        msg += f"   {num_methods + 1}) Back"
+        choice = ui.getValidInput(msg, dtype = int, valid = range(1, num_methods + 1)) - 1
+        if (choice != num_methods):
+            return choice
         return None # user has chosen to go back
 
     def select_analysis_topics(self):
