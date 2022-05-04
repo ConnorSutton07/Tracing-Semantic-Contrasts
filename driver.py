@@ -45,6 +45,11 @@ class Driver:
             ("Generate Mutual Information Scores", self.generate_MIscores)
         ]
 
+        self.analysis = [
+            "Mutual Information Scores for specific data",
+            "Word Embeddings",
+            "Wordclouds"
+        ]
 
         self.keywords = {
             "Religion & Philosophy": 
@@ -88,7 +93,7 @@ class Driver:
         choice = self.select_analysis_method()
         if choice is None: return
         if (choice == 0): self.intra_MIscore(corpus, name)
-        elif (choice == 1): self.analyze_vectors(name)
+        elif (choice == 1): self.analyze_vectors(corpus, name)
         elif (choice == 2): self.generate_wordclouds()
 
     def split_corpus_analysis(self):
@@ -129,13 +134,9 @@ class Driver:
         path = os.path.join(self.get_path([self.paths["data"], name]), "frequencies.json")
         ui.saveToJSON(frequency_dict, path)
 
-        #preprocessed_text = nlp.preprocess_text(corpus)
 
-    def embeddings(self) -> None:
-        corpus, name = self.select_corpus()
-        if corpus is None: return 
+    def analyze_vectors(self, corpus: List[Text], name: str) -> None:
         epochs = 5
-
         keyword_set, keywords = self.select_keywords()
         if keywords is None: return
 
@@ -160,23 +161,25 @@ class Driver:
         else:
             model = FastText.load(model_path)
 
-        neighbors = {
-            "table": 5,
-            "graph": 3
-        }
-
-        model, table_words, graph_words, pcs, explained_variance = nlp.analyze_embeddings(keywords, kwargs, neighbors, model, full_text)
+        model, words, pcs, explained_variance = nlp.word_embeddings(keywords, kwargs, model, full_text)
         model.save(model_path)
-       
     
+        table_words = dict()
+        graph_words = dict()
+        for k, v in words.items():
+            table_words[k] = self.get_most_similar(k, v, 6)
+            graph_words[k] = self.get_most_similar(k, v, 3)
+        graph_words = np.array(sum([[k] + v for k, v in graph_words.items()], []))
         graph_words, indices = np.unique(graph_words, return_index=True)
         pcs = pcs[indices]
-        points = pcs
 
+        print("Plotting vectors...")
         plot_save_path = os.path.join(self.get_path([self.paths["figures"], name, "embeddings"]), f"{keyword_set}.png")
+        print("Tabulating vectors...")
         table_save_path = os.path.join(self.get_path([self.paths["figures"], name, "tables"]), f"{keyword_set}.png")
-        graph.scatter_embeddings(keyword_set, graph_words, points, explained_variance, plot_save_path, adjust_annotations = True)
-        graph.tabulate_embeddings(table_words, table_save_path, keyword_set, neighbors["table"])
+        graph.scatter_embeddings(keyword_set, graph_words, pcs, explained_variance, plot_save_path, adjust_annotations = True)
+        graph.tabulate_embeddings(table_words, table_save_path, keyword_set, length = 6)
+
 
     def generate_collocates(self, query: str, corpus: List[Text], name: str):
         """
@@ -200,6 +203,7 @@ class Driver:
 
         path = os.path.join(self.get_path([self.paths["data"], name, "collocates"]), f"{query}_collocates.json")
         ui.saveToJSON(collocate_dict, path)
+
 
     def generate_MIscores(self):
         """
@@ -226,13 +230,13 @@ class Driver:
         save_path = os.path.join(self.get_path([self.paths["data"], name]), f"{query}_MIscores.json")
         ui.saveToJSON(dict({query : mi_scores}), save_path)
 
+
     def generate_MIscores_withdict(self):
         """
         Calculate MI score for a dictionary. Stored in separate json files featuring categories of study with their respective keywords and MI scores.
         """
         corpus, name = self.select_corpus()
         if corpus is None: return
-        
         
         for category, values in self.keywords.items():
             mi_score_dicts = []
@@ -255,6 +259,7 @@ class Driver:
                 mi_score_dicts.append(dict({query : mi_scores}))
             save_path = os.path.join(self.get_path([self.paths["data"], name]), f"{category}_MIscores.json")
             ui.saveToJSON(dict({category : mi_score_dicts}), save_path)
+
 
     def generate_intra_MIscores(self, name, corpus, part_name, part, query):
         """
@@ -279,7 +284,6 @@ class Driver:
         mi_scores = nlp.mi_scores(collocates, frequencies, query, 4)
         save_path = os.path.join(self.get_path([self.paths["data"], name, part_name]), f"{query}_MIscores.json")
         ui.saveToJSON(dict({query : mi_scores}), save_path)
-
 
 
     def generate_wordclouds(self):
@@ -407,7 +411,7 @@ class Driver:
         i, j = 0, 0
         msw = []
         while i < n:
-            if words[j] not in src and src not in words[j]: 
+            if src not in words[j]: 
                 msw.append(words[j])
                 i += 1
             j += 1
@@ -470,7 +474,7 @@ class Driver:
         for i, corpus in enumerate(self.analysis, start = 1): # list methods for user to choose from
             msg += f"   {i}) {corpus}\n"
         msg += f"   {num_methods + 1}) Back"
-        choice = ui.getValidInput(msg, dtype = int, valid = range(1, num_methods + 1)) - 1
+        choice = ui.getValidInput(msg, dtype = int, valid = range(1, num_methods + 2)) - 1
         if (choice != num_methods):
             return choice
         return None # user has chosen to go back

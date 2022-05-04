@@ -91,15 +91,14 @@ def mi_scores(connocates: Dict[str,int], word_frequencies: Dict[str,int], node_w
     mi_scores = {key:val for key, val in mi_scores.items() if val > 2.5}
     return dict(sorted(mi_scores.items(), key=lambda x: x[1], reverse=True))
 
-def analyze_embeddings(key_words: List[str], kwargs: dict, neighbors: dict, model = None, text: List[str] = None):
+def word_embeddings(key_words: List[str], kwargs: dict, model = None, text: List[str] = None):
     if model is None: model = FastText(text, **kwargs)
 
-    table_words = {words: [item[0] for item in model.wv.most_similar([words], topn = neighbors["table"])] for words in key_words}
-    graph_words = {words: [item[0] for item in model.wv.most_similar([words], topn = neighbors["graph"])] for words in key_words}
-    flattened_graph_words = np.array(sum([[k] + v for k, v in graph_words.items()], []))
-    word_vectors = model.wv[flattened_graph_words]
-    pca = PCA(n_components = 2)
-    p_comps = pca.fit_transform(word_vectors)
-    explained_variance = pca.explained_variance_ratio_
+    words = {words: [item[0] for item in model.wv.most_similar([words], topn = 100)] for words in key_words}
+    flattened_words = np.array(sum([[k] + v for k, v in words.items()], []))
+    vectors = model.wv[flattened_words]
+    reduced_model = PCA(n_components = 2)
+    pcs = reduced_model.fit_transform(vectors)
+    variance_ratio = reduced_model.explained_variance_ratio_
 
-    return model, table_words, flattened_graph_words, p_comps, explained_variance
+    return model, words, pcs, variance_ratio
