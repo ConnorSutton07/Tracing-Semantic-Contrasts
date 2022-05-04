@@ -1,6 +1,7 @@
+from ast import keyword
 import os
 import json
-from core import ui, nlp 
+from core import ui, nlp, graph
 from core.text import Text
 from typing import List, Dict, Tuple, Set
 from tqdm import tqdm
@@ -9,6 +10,8 @@ import multiprocessing as mp
 import numpy as np
 import time 
 from nltk.corpus import stopwords as stopwords_model
+from gensim.models.fasttext import FastText
+from gensim.models.callbacks import CallbackAny2Vec
 
 class Driver:
     def __init__(self) -> None:
@@ -16,7 +19,8 @@ class Driver:
         self.paths["current"]   = os.getcwd()
         self.paths["corpora"]   = os.path.join(self.paths["current"], "corpora")
         self.paths["figures"]   = os.path.join(self.paths["current"], "figures")
-        self.paths["data"]    = os.path.join(self.paths["current"], "data")
+        self.paths["data"]      = os.path.join(self.paths["current"], "data")
+        self.paths["models"]    = os.path.join(self.paths["current"], "models")
 
         self.stopwords = self.create_stopwords()
         
@@ -24,12 +28,29 @@ class Driver:
         self.modes = [
             ("Compare Across Corpora", self.inter_corpus_analysis),
             ("Compare Within Corpus",  self.intra_corpus_analysis),
-            ("Generate Wordclouds",    self.generate_wordclouds),
-            ("Generate data",     self.generate_data),
+            ("Create Embeddings",      self.embeddings),
+            ("Generate Mutual Information Scores", self.generate_MIscores),
+            ("Automate Mutual Information Scores", self.generate_MIscores_withdict),
             ("Print Corpus Contents",  self.print_corpus_info),
-            ("Plot Documents by Decade", self.plot_documents_by_decade),
-            ("Generate Mutual Information Scores", self.generate_MIscores)
+            ("Generate Wordclouds",    self.generate_wordclouds),
+            ("Preprocess data",        self.generate_data),
+            ("Plot Documents by Decade", self.plot_documents_by_decade)
         ]
+
+        self.keywords = {
+            "Religion & Philosophy": 
+                ["sin", "church", "god", "holy", "pray","hell", "heaven", "salvation", "curse", "evil", "fear", "vision", "creation", "death"],
+            "Mankind & Identity": 
+                ["human", "self", "person", "universe", "feel", "pain", "suffer", "friend", "ego", "think", "reason", "ignorant"],
+            "Ethics & Crime": 
+                ["moral", "steal", "thief", "kill", "murder", "adultery", "spy", "envy", "greed", "desire", "give"],
+            "Government & Politics": 
+                ["government", "king", "queen", "power", "poverty", "rank", "noble", "rich", "war", "justice", "law", "treason"],
+            "Family & Gender": 
+                ["man", "woman", "father", "mother", "daughter", "son", "sister", "brother", "child", "home", "sex", "community"],
+            "Nature": 
+                ["earth", "sun", "forest", "castle", "moon", "outerspace", "world", "nature"]
+        }
 
         self.introduction()
 
@@ -95,6 +116,87 @@ class Driver:
 
         #preprocessed_text = nlp.preprocess_text(corpus)
 
+    def embeddings(self) -> None:
+        corpus, name = self.select_corpus()
+        if corpus is None: return 
+        epochs = 5
+
+        keyword_set, keywords = self.select_keywords()
+        if keywords is None: return
+
+        print(keywords)
+        input()
+
+        model_path = os.path.join(self.paths["models"], 'embeddings.model')
+        model = None 
+        full_text = []
+        kwargs = None
+
+        if not os.path.isfile(model_path): 
+            print("Concatenating texts...")
+            for document in tqdm(corpus):
+                full_text = full_text + document.preprocessed_text(self.stopwords)
+            kwargs = {
+                "vector_size": 100,
+                "window": 4,
+                "min_count": 5,
+                "sample": 1e-2,
+                "sg": 1,
+                "epochs": epochs,
+                "callbacks": (_EmbeddingProgress(epochs),) 
+            }
+        else:
+            model = FastText.load(model_path)
+
+        neighbors = {
+            "table": 5,
+            "graph": 3
+        }
+
+        model, table_words, graph_words, pcs, explained_variance = nlp.analyze_embeddings(keywords, kwargs, neighbors, model, full_text)
+        model.save(model_path)
+       
+    
+        graph_words, indices = np.unique(graph_words, return_index=True)
+        pcs = pcs[indices]
+        points = pcs
+
+        plot_save_path = self.get_path(os.path.join(self.paths["figures"], name, "embeddings"))
+        table_save_path = os.path.join(self.paths["figures"], name, "tables")
+        graph.scatter_embeddings(t, graph_words, points, explained_variance, plot_save_path, adjust_annotations = True)
+        graph.tabulate_embeddings(table_words, table_save_path, t.get_info(), settings.neighbors["table"])
+
+        print(len(full_text))
+        print(graph_words)
+        print(table_words)
+        print(points)
+
+        return
+        
+        for t in tqdm(corpus):
+            text = t.get_delimited_text()
+            counts = np.zeros((len(keywords), ))
+            text = analysis.preprocess_text(text, stopwords = settings.stopwords, replacements = settings.replacements, no_lemmatization = settings.no_lemmatization)
+            corpus = []
+            for section in text:
+                counts += np.array([section.count(w) for w in keywords])
+                corpus.append(section.split(' '))
+            table_words, graph_words, pcs, explained_variance = analysis.analyze_embeddings(corpus, keywords, kwargs, settings.neighbors)
+            graph_words, indices = np.unique(graph_words, return_index=True)
+            pcs = pcs[indices]
+            points = pcs
+            #points = analysis.normalize2D(pcs[:, 0], pcs[:, 1])
+            plot_save_path = os.path.join(self.paths["figures"], text_path, "embeddings", f"embeddings_{t.lastname}.jpg")
+            table_save_path = os.path.join(self.paths["figures"], text_path, "tables", f"table_{t.lastname}.png")
+            graph.scatter_embeddings(t, graph_words, points, explained_variance, plot_save_path, adjust_annotations = True)
+            graph.tabulate_embeddings(table_words, table_save_path, t.get_info(), settings.neighbors["table"])
+            if printing:
+                print()
+                t.print_info()
+                for i, (k,v) in enumerate(table_words.items()):
+                    print(f"{k} ({counts[i]}): {v}")
+                print('-----------------------------------')
+
     def generate_collocates(self, query: str, corpus: List[Text], name: str):
         """
         Create collocate dictionary with a given string.
@@ -115,7 +217,7 @@ class Driver:
         collocates = [x[1] for x in data if x[1]]
         collocate_dict = dict(zip(titles, collocates))
 
-        path = os.path.join(self.get_path([self.paths["data"], name]), f"{query}_collocates.json")
+        path = os.path.join(self.get_path([self.paths["data"], name, "collocates"]), f"{query}_collocates.json")
         ui.saveToJSON(collocate_dict, path)
 
     def generate_MIscores(self):
@@ -124,12 +226,13 @@ class Driver:
         """
         corpus, name = self.select_corpus()
         if corpus is None: return
+        
         query = input("Word: ")
 
         frequency_path = self.get_path([self.paths['data'], name, 'frequencies.json'])
         infile = open(frequency_path)
         frequency_file = json.load(infile)
-        model_path = os.path.join(self.get_path([self.paths["data"], name]), f"{query}_collocates.json")
+        model_path = os.path.join(self.get_path([self.paths["data"], name, "collocates"]), f"{query}_collocates.json")
 
         if not os.path.isfile(model_path): self.generate_collocates(query, corpus, name)
 
@@ -142,6 +245,36 @@ class Driver:
         save_path = os.path.join(self.get_path([self.paths["data"], name]), f"{query}_MIscores.json")
         ui.saveToJSON(dict({query : mi_scores}), save_path)
 
+    def generate_MIscores_withdict(self):
+        """
+        Calculate MI score for a dictionary. Stored in separate json files featuring categories of study with their respective keywords and MI scores.
+        """
+        corpus, name = self.select_corpus()
+        if corpus is None: return
+        
+        
+        for category, values in self.keywords.items():
+            mi_score_dicts = []
+            for word in values:
+                query = word
+
+                frequency_path = self.get_path([self.paths['data'], name, 'frequencies.json'])
+                infile = open(frequency_path)
+                frequency_file = json.load(infile)
+                model_path = os.path.join(self.get_path([self.paths["data"], name, "collocates"]), f"{query}_collocates.json")
+
+                if not os.path.isfile(model_path): self.generate_collocates(query, corpus, name)
+
+                with open(model_path, 'r') as f:
+                    collocate_file = json.load(f)
+
+                collocates = nlp.merge_dict(collocate_file, True)
+                frequencies = nlp.merge_dict(frequency_file)
+                mi_scores = nlp.mi_scores(collocates, frequencies, query, 4)
+                mi_score_dicts.append(dict({query : mi_scores}))
+            save_path = os.path.join(self.get_path([self.paths["data"], name]), f"{category}_MIscores.json")
+            ui.saveToJSON(dict({category : mi_score_dicts}), save_path)
+
     def generate_intra_MIscores(self, name, corpus, part_name, part, query):
         """
         Calculate the MI score of a given partition of a corpus
@@ -151,7 +284,7 @@ class Driver:
         infile = open(frequency_path)
         frequency_file = json.load(infile)
         frequency_file = {txt.title:frequency_file[txt.title] for txt in part} 
-        model_path = os.path.join(self.get_path([self.paths["data"], name]), f"{query}_collocates.json")
+        model_path = os.path.join(self.get_path([self.paths["data"], name, "collocates"]), f"{query}_collocates.json")
 
         if not os.path.isfile(model_path): self.generate_collocates(query, corpus, name)
 
@@ -288,6 +421,18 @@ class Driver:
         # STOPWORDS = STOPWORDS - {"he", "she"}
         return STOPWORDS
 
+    @staticmethod 
+    def get_most_similar(src: str, words: List[str], n: int) -> List[str]:
+        i, j = 0, 0
+        msw = []
+        while i < n:
+            if words[j] not in src and src not in words[j]: 
+                msw.append(words[j])
+                i += 1
+            j += 1
+        return msw
+
+
     # ----------------------------------------------
     #                UI Methods
     #-----------------------------------------------
@@ -371,4 +516,30 @@ class Driver:
         part = ui.getValidInput('> ', dtype = int, valid=range(1, len(gens) + 1)) - 1
         '''     
         return name1, name2, fun1, fun2
+
+    def select_keywords(self):
+        num_sets = len(self.keywords)
+        msg = "Keyword Set:\n" 
+        for i, (k, v) in enumerate(self.keywords.items(), start = 1): 
+            msg += f"   {i}) {k}\n"
+        msg += f"   {num_sets + 1}) Enter a new word\n"
+        msg += f"   {num_sets + 2}) Back" 
+        choice = ui.getValidInput(msg, dtype = int, valid=range(1, num_sets + 3)) - 1 
+        if choice < num_sets:
+            return list(self.keywords.items())[choice] 
+        elif choice == num_sets:
+            return [input("Enter word: ")], ""
+        return None, None # user has chosen to leave the program
             
+class _EmbeddingProgress(CallbackAny2Vec):
+    def __init__(self, max_epochs) -> None:
+        super().__init__()
+        self.epoch = 0
+        self.pbar = tqdm(total = max_epochs, desc = 'Creating embeddings...')
+
+    def on_epoch_end(self, _) -> None:
+        self.pbar.update()
+        self.epoch += 1
+    
+    def on_train_end(self, _) -> None:
+        del self.pbar

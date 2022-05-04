@@ -41,6 +41,6 @@ class Text:
         path = osp.join('preprocessed')
         if not osp.exists(osp.join(self.path, 'preprocessed', self.file)):
             self.preprocess(stopwords)
-        with open(osp.join(self.path, 'preprocessed', self.file), 'r',encoding = 'utf8') as f: 
+        with open(osp.join(self.path, 'preprocessed', self.file), 'r', encoding = 'utf8') as f: 
             contents = json.load(f)
         return contents 

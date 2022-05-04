@@ -1,15 +1,19 @@
-from nltk import word_tokenize
+from nltk import word_tokenize, sent_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords as stopwords_model
 from functools import lru_cache
 from typing import List, Dict, Set
-import re
+from gensim.models.fasttext import FastText
+from sklearn.decomposition import PCA
 from unidecode import unidecode
+import re
 import numpy as np
 
 
-def tokenize(text: str) -> List[str]:
-    return word_tokenize(text)
+def tokenize(text: str) -> List[List[str]]:
+    sentences = sent_tokenize(text)
+    tokens = [word_tokenize(sent) for sent in sentences]
+    return tokens
 
 @lru_cache(maxsize=2**16)  # 2**15 = 32768
 def lemmatize(word: str) -> str:
@@ -30,15 +34,20 @@ def preprocess_text(text: str, stopwords: Set[str]) -> List[str]:
     """
     filtered = filter_text(text)
     tokens = tokenize(filtered)
-    cleaned = [w for w in tokens if token not in stopwords]
-    lemmatized = [lemmatize(w) for w in cleaned]
-    return [w for w in lemmatized if len(w) > 1]
-    # return [lemmatize(token) for token in tokenize(filter_text(text)) if valid_token(token)]
-
+    cleaned = [[w for w in sent if w not in stopwords] for sent in tokens]
+    # cleaned = [w for w in tokens if token not in stopwords]
+    # cleaned = [[w for w in sent if token not in stopwords] for sent in tokens]
+    #lemmatized = [lemmatize(w) for w in cleaned]
+    lemmatized = [[lemmatize(w) for w in sent] for sent in cleaned]
+    return [[w for w in sent if len(w) > 1] for sent in lemmatized]
 
 def create_frequency_dict(text: List[str]) -> Dict[str, int]:
+    full_text = []
+    for sent in text:
+        full_text = full_text + sent 
+    
     frequencies = dict()
-    for word in text:
+    for word in full_text:
         if word in frequencies: frequencies[word] += 1
         else: frequencies[word] = 1
     return frequencies
@@ -78,6 +87,19 @@ def mi_scores(connocates: Dict[str,int], word_frequencies: Dict[str,int], node_w
     for collocate, near_count in connocates.items():
         collocate_count = word_frequencies.get(collocate)
         score = np.log((near_count * corpus_size)/(node_count * collocate_count * span)) / np.log(2)
-        mi_scores[collocate] = score
-    mi_scores = {key:val for key, val in mi_scores.items() if val > 1}
+        mi_scores[collocate] = np.round(score, 2)
+    mi_scores = {key:val for key, val in mi_scores.items() if val > 2.5}
     return dict(sorted(mi_scores.items(), key=lambda x: x[1], reverse=True))
+
+def analyze_embeddings(key_words: List[str], kwargs: dict, neighbors: dict, model = None, text: List[str] = None):
+    if model is None: model = FastText(text, **kwargs)
+
+    table_words = {words: [item[0] for item in model.wv.most_similar([words], topn = neighbors["table"])] for words in key_words}
+    graph_words = {words: [item[0] for item in model.wv.most_similar([words], topn = neighbors["graph"])] for words in key_words}
+    flattened_graph_words = np.array(sum([[k] + v for k, v in graph_words.items()], []))
+    word_vectors = model.wv[flattened_graph_words]
+    pca = PCA(n_components = 2)
+    p_comps = pca.fit_transform(word_vectors)
+    explained_variance = pca.explained_variance_ratio_
+
+    return model, table_words, flattened_graph_words, p_comps, explained_variance
