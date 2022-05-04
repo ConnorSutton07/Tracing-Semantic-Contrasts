@@ -1,0 +1,167 @@
+{
+    "Ethics&Crime": [
+        {
+            "moral": {
+                "physical": 7.89,
+                "lesson": 5.17,
+                "material": 5.02,
+                "principle": 4.89,
+                "element": 4.73,
+                "example": 3.88,
+                "courage": 3.79,
+                "beauty": 3.25,
+                "world": 3.09
+            }
+        },
+        {
+            "steal": {
+                "shade": 5.31,
+                "away": 3.61
+            }
+        },
+        {
+            "thief": {
+                "prostitute": 8.6,
+                "thief": 8.25,
+                "clopin": 7.25,
+                "vagabond": 7.25,
+                "shouting": 6.76,
+                "gang": 6.75,
+                "assassin": 6.61,
+                "murderer": 6.47,
+                "stop": 6.45,
+                "den": 6.19,
+                "beggar": 5.95,
+                "forty": 5.39,
+                "amongst": 3.87,
+                "common": 3.55
+            }
+        },
+        {
+            "kill": {
+                "kill": 7.19,
+                "turnkey": 6.37,
+                "deer": 5.96,
+                "queequeg": 5.47,
+                "bernard": 5.36,
+                "edifice": 4.79,
+                "burn": 4.6,
+                "vampyre": 4.23,
+                "fish": 4.09,
+                "javert": 4.01,
+                "whale": 3.56,
+                "wounded": 3.42,
+                "dante": 3.22,
+                "porthos": 3.2,
+                "devil": 3.17,
+                "artagnan": 2.67,
+                "would": 2.54,
+                "monsieur": 2.51
+            }
+        },
+        {
+            "murder": {
+                "wampyre": 9.9,
+                "murder": 7.43,
+                "perpetrated": 7.21,
+                "committed": 7.05,
+                "kenrick": 6.97,
+                "suicide": 6.4,
+                "treachery": 6.28,
+                "convict": 4.72,
+                "shouted": 4.54,
+                "lydia": 4.26,
+                "crime": 4.22,
+                "charge": 4.18,
+                "nearer": 3.9,
+                "horrible": 3.88,
+                "stop": 3.81,
+                "trial": 3.73,
+                "tried": 3.57,
+                "attempt": 3.05,
+                "castle": 2.68
+            }
+        },
+        {
+            "adultery": {}
+        },
+        {
+            "spy": {
+                "rochellais": 9.67,
+                "police": 7.43,
+                "enjolras": 6.5,
+                "javert": 5.63,
+                "cardinal": 5.34
+            }
+        },
+        {
+            "envy": {
+                "envy": 6.73,
+                "rushworth": 6.39
+            }
+        },
+        {
+            "greed": {}
+        },
+        {
+            "desire": {
+                "ardent": 5.7,
+                "complied": 5.41,
+                "earnest": 5.09,
+                "raffle": 4.17,
+                "expressed": 4.16,
+                "excite": 4.1,
+                "ambrosio": 3.82,
+                "excellency": 3.78,
+                "estrelle": 3.63,
+                "paradise": 3.63,
+                "desire": 3.43,
+                "vengeance": 3.29,
+                "villiers": 2.83,
+                "mazarin": 2.56,
+                "annette": 2.52
+            }
+        },
+        {
+            "give": {
+                "kirwin": 5.84,
+                "piastre": 4.63,
+                "information": 4.48,
+                "advice": 4.39,
+                "credit": 4.36,
+                "broussel": 4.33,
+                "mum": 4.29,
+                "forster": 4.15,
+                "explanation": 3.9,
+                "guinea": 3.77,
+                "sacrament": 3.77,
+                "encouragement": 3.75,
+                "lesson": 3.48,
+                "utterance": 3.44,
+                "em": 3.43,
+                "proof": 3.42,
+                "instruction": 3.39,
+                "hint": 3.37,
+                "vent": 3.29,
+                "trouble": 3.22,
+                "satisfaction": 3.16,
+                "pistoles": 3.07,
+                "lizzy": 3.04,
+                "evidence": 3.02,
+                "detail": 2.96,
+                "offence": 2.96,
+                "account": 2.93,
+                "pound": 2.86,
+                "opportunity": 2.86,
+                "notice": 2.86,
+                "refusal": 2.82,
+                "franc": 2.8,
+                "pain": 2.79,
+                "vote": 2.76,
+                "order": 2.69,
+                "pleasure": 2.68,
+                "opinion": 2.54
+            }
+        }
+    ]
+}

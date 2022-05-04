@@ -59,13 +59,16 @@ class Driver:
         Compare corpus based on data such as author, gender, etc.
         """
         corpus, name = self.select_corpus()
-        name1, name2, fun1, fun2 = self.select_analysis_topics()
+        name1, name2, fun1, fun2, method = self.select_analysis_topics()
         part1 = [txt for txt in corpus if fun1(txt)]
         part2 = [txt for txt in corpus if fun2(txt)]
-        query = input('Word: ')
+        if method is self.generate_intra_MIscores:
+            query = input('Word: ')
+        else:
+            query = None
         
-        self.generate_intra_MIscores(name, corpus, name1, part1, query)
-        self.generate_intra_MIscores(name, corpus, name2, part2, query)
+        method(name, corpus, name1, part1, query)
+        method(name, corpus, name2, part2, query)
 
 
 
@@ -201,6 +204,40 @@ class Driver:
         mi_scores = nlp.mi_scores(collocates, frequencies, query, 4)
         save_path = os.path.join(self.get_path([self.paths["data"], name, part_name]), f"{query}_MIscores.json")
         ui.saveToJSON(dict({query : mi_scores}), save_path)
+
+    def generate_intra_MIscores_withdict(self, name, corpus, part_name, part, query):
+        """
+        Calculate MI score for a dictionary. Stored in separate json files featuring categories of study with their respective keywords and MI scores.
+        """
+        keywords = {"Religion&Philosophy": ["sin", "church", "god", "holy", "pray","hell", "heaven", "salvation", "curse", "evil", "fear", "vision", "creation", "death"],
+                    "Mankind&Identity": ["human", "self", "person", "universe", "feel", "pain", "suffer", "friend", "ego", "think", "reason", "ignorant"],
+                    "Ethics&Crime": ["moral", "steal", "thief", "kill", "murder", "adultery", "spy", "envy", "greed", "desire", "give"],
+                    "Government&Politics": ["government", "king", "queen", "power", "poverty", "rank", "noble", "rich", "war", "justice", "law", "treason"],
+                    "Family&Gender": ["man", "woman", "father", "mother", "daughter", "son", "sister", "brother", "child", "home", "sex", "community"],
+                    "Nature": ["earth", "sun", "forest", "castle", "moon", "outerspace", "world", "nature"]
+                    }
+        for category, values in keywords.items():
+            mi_score_dicts = []
+            for word in values:
+                query = word
+
+                frequency_path = self.get_path([self.paths['data'], name, 'frequencies.json'])
+                infile = open(frequency_path)
+                frequency_file = json.load(infile)
+                model_path = os.path.join(self.get_path([self.paths["data"], name, "collocates"]), f"{query}_collocates.json")
+
+                if not os.path.isfile(model_path): self.generate_collocates(query, corpus, name)
+
+                with open(model_path, 'r') as f:
+                    collocate_file = json.load(f)
+
+                collocates = nlp.merge_dict(collocate_file, True)
+                frequencies = nlp.merge_dict(frequency_file)
+                mi_scores = nlp.mi_scores(collocates, frequencies, query, 4)
+                mi_score_dicts.append(dict({query : mi_scores}))
+            save_path = os.path.join(self.get_path([self.paths["data"], name, part_name]), f"{category}_MIscores.json")
+            ui.saveToJSON(dict({category : mi_score_dicts}), save_path)
+
 
 
 
@@ -367,7 +404,7 @@ class Driver:
         Selects what to analyze a corpus based on
         """
         parts = ["Gender", "Year"]
-        gens = ['Generate MI Scores']
+        gens = ['Generate MI Scores', 'Automate MI Scores']
         print('How should the corpus be partitioned:')
         for i, part in enumerate(parts, start = 1):
             print(f'\t{i}) {part}')
@@ -391,11 +428,13 @@ class Driver:
             name2 = f'{range2[0]}-{range2[1]}'
             fun1 = lambda txt : txt.year >= range1[0] and txt.year <= range1[1]
             fun2 = lambda txt : txt.year >= range2[0] and txt.year <= range2[1]
-        '''
         print('What should be generated:')
         for i, gen in enumerate(gens, start = 1):
             print(f'\t{i}) {gen}')
-        part = ui.getValidInput('> ', dtype = int, valid=range(1, len(gens) + 1)) - 1
-        '''     
-        return name1, name2, fun1, fun2
+        gen = ui.getValidInput('', dtype = int, valid=range(1, len(gens) + 1)) - 1
+        if gen == 0:
+            method = self.generate_intra_MIscores 
+        elif gen == 1:
+            method = self.generate_intra_MIscores_withdict
+        return name1, name2, fun1, fun2, method
             
