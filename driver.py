@@ -124,9 +124,6 @@ class Driver:
         keyword_set, keywords = self.select_keywords()
         if keywords is None: return
 
-        print(keywords)
-        input()
-
         model_path = os.path.join(self.paths["models"], 'embeddings.model')
         model = None 
         full_text = []
@@ -161,41 +158,10 @@ class Driver:
         pcs = pcs[indices]
         points = pcs
 
-        plot_save_path = self.get_path(os.path.join(self.paths["figures"], name, "embeddings"))
-        table_save_path = os.path.join(self.paths["figures"], name, "tables")
-        graph.scatter_embeddings(t, graph_words, points, explained_variance, plot_save_path, adjust_annotations = True)
-        graph.tabulate_embeddings(table_words, table_save_path, t.get_info(), settings.neighbors["table"])
-
-        print(len(full_text))
-        print(graph_words)
-        print(table_words)
-        print(points)
-
-        return
-        
-        for t in tqdm(corpus):
-            text = t.get_delimited_text()
-            counts = np.zeros((len(keywords), ))
-            text = analysis.preprocess_text(text, stopwords = settings.stopwords, replacements = settings.replacements, no_lemmatization = settings.no_lemmatization)
-            corpus = []
-            for section in text:
-                counts += np.array([section.count(w) for w in keywords])
-                corpus.append(section.split(' '))
-            table_words, graph_words, pcs, explained_variance = analysis.analyze_embeddings(corpus, keywords, kwargs, settings.neighbors)
-            graph_words, indices = np.unique(graph_words, return_index=True)
-            pcs = pcs[indices]
-            points = pcs
-            #points = analysis.normalize2D(pcs[:, 0], pcs[:, 1])
-            plot_save_path = os.path.join(self.paths["figures"], text_path, "embeddings", f"embeddings_{t.lastname}.jpg")
-            table_save_path = os.path.join(self.paths["figures"], text_path, "tables", f"table_{t.lastname}.png")
-            graph.scatter_embeddings(t, graph_words, points, explained_variance, plot_save_path, adjust_annotations = True)
-            graph.tabulate_embeddings(table_words, table_save_path, t.get_info(), settings.neighbors["table"])
-            if printing:
-                print()
-                t.print_info()
-                for i, (k,v) in enumerate(table_words.items()):
-                    print(f"{k} ({counts[i]}): {v}")
-                print('-----------------------------------')
+        plot_save_path = os.path.join(self.get_path([self.paths["figures"], name, "embeddings"]), f"{keyword_set}.png")
+        table_save_path = os.path.join(self.get_path([self.paths["figures"], name, "tables"]), f"{keyword_set}.png")
+        graph.scatter_embeddings(keyword_set, graph_words, points, explained_variance, plot_save_path, adjust_annotations = True)
+        graph.tabulate_embeddings(table_words, table_save_path, keyword_set, neighbors["table"])
 
     def generate_collocates(self, query: str, corpus: List[Text], name: str):
         """

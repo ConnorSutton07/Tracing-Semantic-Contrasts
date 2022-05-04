@@ -3,7 +3,7 @@ from adjustText import adjust_text
 import matplotlib.pyplot as plt
 import numpy as np
 
-def scatter_embeddings(t: Translation, words: List[str], pcs, explained_variance, save_path: str, adjust_annotations: bool = True) -> None:
+def scatter_embeddings(label: str, words: List[str], pcs, explained_variance, save_path: str, adjust_annotations: bool = True) -> None:
     with plt.style.context('Solarize_Light2'):
         plt.figure(figsize=(12, 8))
         plt.rcParams.update({'font.family':'serif'})
@@ -17,13 +17,13 @@ def scatter_embeddings(t: Translation, words: List[str], pcs, explained_variance
 
         plt.xlabel("PC1 | " + "{:.2%}".format(explained_variance[0]))
         plt.ylabel("PC2 | " + "{:.2%}".format(explained_variance[1]))
-        plt.title(f"Word Embeddings | Translation: {t.get_info()}") 
+        plt.title(f"Word Embeddings | Translation: {label}") 
         plt.savefig(save_path, dpi=200)
 
 def tabulate_embeddings(embeddings: dict, save_path: str, keyword_set: str, length: int):
     with plt.style.context('Solarize_Light2'):
         fig = plt.figure(figsize=(12, 3))
-        plt.rcParams.update({++
+        plt.rcParams.update({
             'font.family': 'serif',
             'font.size': 12
         })
