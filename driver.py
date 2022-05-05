@@ -24,18 +24,6 @@ class Driver:
 
         self.stopwords = self.create_stopwords()
         
-        # # list of methods that user will be able to choose from 
-        # self.modes = [
-        #     ("Compare Across Corpora", self.inter_corpus_analysis),
-        #     ("Compare Within Corpus",  self.intra_corpus_analysis),
-        #     ("Create Embeddings",      self.embeddings),
-        #     ("Generate Mutual Information Scores", self.generate_MIscores),
-        #     ("Automate Mutual Information Scores", self.generate_MIscores_withdict),
-        #     ("Print Corpus Contents",  self.print_corpus_info),
-        #     ("Generate Wordclouds",    self.generate_wordclouds),
-        #     ("Preprocess data",        self.generate_data),
-        #     ("Plot Documents by Decade", self.plot_documents_by_decade)
-        # ]
         self.modes = [
             ("Analyze Entire Corpus", self.entire_corpus_analysis),
             ("Analyze Split Corpus",  self.split_corpus_analysis),
@@ -63,7 +51,7 @@ class Driver:
             "Family & Gender": 
                 ["man", "woman", "father", "mother", "daughter", "son", "sister", "brother", "child", "home", "sex", "community"],
             "Nature": 
-                ["earth", "sun", "forest", "castle", "moon", "outerspace", "world", "nature"]
+                ["earth", "sun", "forest", "castle", "moon", "world", "nature", "sky", "water", "grow"]
         }
 
         self.introduction()
@@ -93,7 +81,7 @@ class Driver:
         choice = self.select_analysis_method()
         if choice is None: return
         if (choice == 0): self.intra_MIscore(corpus, name)
-        elif (choice == 1): self.analyze_vectors(corpus, name)
+        elif (choice == 1): self.analyze_vectors(corpus, name, name)
         elif (choice == 2): self.generate_wordclouds()
 
     def split_corpus_analysis(self):
@@ -101,14 +89,16 @@ class Driver:
         Compare corpus based on data such as author, gender, etc.
         """
         corpus, name = self.select_corpus()
-        name1, name2, fun1, fun2 = self.select_analysis_topics()
-        part1 = [txt for txt in corpus if fun1(txt)]
-        part2 = [txt for txt in corpus if fun2(txt)]
-        query = input('Word: ')
         
-        self.generate_intra_MIscores(name, corpus, name1, part1, query)
-        self.generate_intra_MIscores(name, corpus, name2, part2, query)
+        n1, n2, fun1, fun2 = self.select_analysis_topics()
+        c1 = [txt for txt in corpus if fun1(txt)]
+        c2 = [txt for txt in corpus if fun2(txt)]
 
+        choice = self.select_analysis_method()
+        if choice is None: return
+        elif (choice == 1): 
+            self.analyze_vectors(c1, name, n1)
+            self.analyze_vectors(c2, name, n2)
 
 
     def generate_data(self):
@@ -135,12 +125,13 @@ class Driver:
         ui.saveToJSON(frequency_dict, path)
 
 
-    def analyze_vectors(self, corpus: List[Text], name: str) -> None:
+    def analyze_vectors(self, corpus: List[Text], name: str, info: str) -> None:
         epochs = 5
         keyword_set, keywords = self.select_keywords()
         if keywords is None: return
 
-        model_path = os.path.join(self.paths["models"], 'embeddings.model')
+        figure_path = info.replace(' ', '_')
+        model_path = os.path.join(self.paths["models"], f'{figure_path}_embeddings.model')
         model = None 
         full_text = []
         kwargs = None
@@ -156,7 +147,9 @@ class Driver:
                 "sample": 1e-2,
                 "sg": 1,
                 "epochs": epochs,
-                "callbacks": (_EmbeddingProgress(epochs),) 
+                "callbacks": (_EmbeddingProgress(epochs),),
+                "max_n": 0,
+                "min_n": 1
             }
         else:
             model = FastText.load(model_path)
@@ -174,9 +167,10 @@ class Driver:
         pcs = pcs[indices]
 
         print("Plotting vectors...")
-        plot_save_path = os.path.join(self.get_path([self.paths["figures"], name, "embeddings"]), f"{keyword_set}.png")
+        plot_save_path = os.path.join(self.get_path([self.paths["figures"], figure_path, "embeddings"]), f"{keyword_set}.png")
         print("Tabulating vectors...")
-        table_save_path = os.path.join(self.get_path([self.paths["figures"], name, "tables"]), f"{keyword_set}.png")
+        graph_info = keyword_set if name == figure_path else keyword_set + " | " + info
+        table_save_path = os.path.join(self.get_path([self.paths["figures"], figure_path, "tables"]), f"{keyword_set}.png")
         graph.scatter_embeddings(keyword_set, graph_words, pcs, explained_variance, plot_save_path, adjust_annotations = True)
         graph.tabulate_embeddings(table_words, table_save_path, keyword_set, length = 6)
 
@@ -490,8 +484,8 @@ class Driver:
             print(f'\t{i}) {part}')
         part = ui.getValidInput('', dtype = int, valid=range(1, len(parts) + 1)) - 1
         if part == 0:
-            name1 = 'men'
-            name2 = 'women'
+            name1 = 'Male Authors'
+            name2 = 'Female Authors'
             fun1 = lambda txt : txt.gender == 'M'
             fun2 = lambda txt : txt.gender == 'F'
         elif part == 1:
